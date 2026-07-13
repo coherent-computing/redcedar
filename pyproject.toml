@@ -3,13 +3,13 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cascade-quantum"
+name = "redcedar"
 version = "0.1.0"
-description = "Python client for Cascade Quantum ML server"
+description = "Python client for the Red Cedar quantum machine learning server"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
-authors = [{name = "Coherent Computing"}]
+authors = [{name = "Cascade Quantum"}]
 
 dependencies = [
     "requests>=2.28",
@@ -19,4 +19,4 @@ dependencies = [
 plotting = ["matplotlib>=3.5"]
 
 [tool.setuptools.packages.find]
-include = ["cascade_quantum*"]
+include = ["redcedar*"]

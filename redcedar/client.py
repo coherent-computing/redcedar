@@ -12,22 +12,22 @@ from .explainable import ExplainableManager
 
 
 def connect(url=None, api_key=None):
-    """Create a CascadeClient connected to the server.
+    """Create a RedCedarClient connected to the server.
 
     Args:
-        url: Server URL. Defaults to CQ_URL env var or http://localhost:8000.
-        api_key: API key. Defaults to CQ_API_KEY env var.
+        url: Server URL. Defaults to REDCEDAR_URL env var or http://localhost:8000.
+        api_key: API key. Defaults to REDCEDAR_API_KEY env var.
 
     Returns:
-        CascadeClient instance.
+        RedCedarClient instance.
     """
-    url = url or os.environ.get("CQ_URL", "http://localhost:8000")
-    api_key = api_key or os.environ.get("CQ_API_KEY", "")
-    return CascadeClient(url, api_key)
+    url = url or os.environ.get("REDCEDAR_URL", "http://localhost:8000")
+    api_key = api_key or os.environ.get("REDCEDAR_API_KEY", "")
+    return RedCedarClient(url, api_key)
 
 
-class CascadeClient:
-    """Main client for interacting with the Cascade Quantum server."""
+class RedCedarClient:
+    """Main client for interacting with the Red Cedar server."""
 
     def __init__(self, url, api_key):
         self.url = url.rstrip("/")
