@@ -10,7 +10,7 @@ class ExplainableManager:
     def run(self, train_id, verbose=False, on_progress=None):
         """Run explainable AI analysis on a trained model.
 
-        Constructs Grover-like reflection circuits to identify which input
+        Constructs quantum circuits to identify which input
         features are most important for classification decisions.
 
         Args:
