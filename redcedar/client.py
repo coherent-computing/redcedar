@@ -92,7 +92,7 @@ class RedCedarClient:
     def _run_job(self, post_path, stream_path, body=None, verbose=False, on_progress=None):
         """Start a job via POST, consume SSE until done. Returns summary."""
         result = self._post(post_path, body)
-        job_id = result.get("job_id")
+        job_id = result.get("job_id") or result.get("train_id")
         if not job_id:
             return result
 
