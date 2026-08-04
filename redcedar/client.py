@@ -32,6 +32,7 @@ class RedCedarClient:
     def __init__(self, url, api_key):
         self.url = url.rstrip("/")
         self.api_key = api_key
+        self._last_job_id = None
         self.datasets = DatasetManager(self)
         self.analysis = AnalysisManager(self)
         self.training = TrainingManager(self)
@@ -93,6 +94,7 @@ class RedCedarClient:
         """Start a job via POST, consume SSE until done. Returns summary."""
         result = self._post(post_path, body)
         job_id = result.get("job_id") or result.get("train_id")
+        self._last_job_id = job_id
         if not job_id:
             return result
 

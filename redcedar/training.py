@@ -20,7 +20,7 @@ class TrainingManager:
             on_progress: Callback(percent, message) for progress updates.
 
         Returns:
-            Dict with train_id, best_test_accuracy, elapsed_seconds, etc.
+            Dict with train_id, total_layers, elapsed_seconds, etc.
         """
         params = load_settings(settings)
         params["dataset_selection"] = {
@@ -29,10 +29,18 @@ class TrainingManager:
             "dataset_name": dataset_id,
         }
 
-        return self._client._run_job(
+        result = self._client._run_job(
             "/train",
             "/train/{job_id}/stream",
             body={"parameters": params, "user_id": "sdk"},
             verbose=verbose,
             on_progress=on_progress,
         )
+
+        # The SSE summary doesn't include train_id, but callers need it
+        # for inference and explainable calls. Add it from the POST response
+        # which _run_job used internally.
+        if result and "train_id" not in result:
+            result["train_id"] = self._client._last_job_id
+
+        return result

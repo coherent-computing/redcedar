@@ -44,7 +44,7 @@ for ds in datasets:
     print(ds['id'], ds['name'], ds.get('rows'), ds.get('classes'))
 ```
 
-Each entry is a dict with fields: `id`, `name`, `description`, `source`, `rows`, `columns`, `classes`, `available`.
+Each entry is a dict. The most useful fields: `id`, `name`, `description`, `category`, `source`, `rows`, `columns`, `classes`, `available`. Some datasets include additional fields like `recommended` or `dataset_name`.
 
 The `id` is what you pass to analysis and training functions (e.g., `"wdbc"`, `"iris"`, `"diabetes"`).
 
@@ -71,7 +71,7 @@ print(pca['thresholds']['90'])      # 7  (components for 90% variance)
 print(pca['thresholds']['95'])      # 10
 ```
 
-Returns a dict with: `dataset_name`, `features`, `samples`, `variance_ratios` (list), `cumulative_variance` (list), `thresholds` (dict mapping percentage strings to component counts), `elapsed_seconds`.
+Returns a dict with: `dataset_name`, `features`, `samples`, `n_components`, `variance_ratios` (list), `cumulative_variance` (list), `thresholds` (dict mapping percentage strings to component counts), `elapsed_seconds`.
 
 ### `client.analysis.mi(dataset_id)`
 
@@ -85,7 +85,7 @@ for f in mi['ranked_features'][:5]:
     print(f['feature_name'], f['mi_score'])
 ```
 
-Returns a dict with: `total_mi`, `ranked_features` (list of dicts with `rank`, `feature_name`, `mi_score`, `mi_percent`), `cumulative_mi` (list), `thresholds`, `elapsed_seconds`.
+Returns a dict with: `dataset_name`, `samples`, `features`, `classes`, `total_mi`, `ranked_features` (list of dicts with `rank`, `feature_index`, `feature_name`, `mi_score`, `mi_percent`), `cumulative_mi` (list), `thresholds`, `elapsed_seconds`.
 
 ### `client.analysis.qre(dataset_id)`
 
@@ -97,7 +97,7 @@ print(qre['estimatedQubits'])       # 16
 print(qre['standardDeviation'])     # 1.4
 ```
 
-Returns a dict with: `estimatedQubits`, `standardDeviation`, `samples`, `features`, `classes`, `elapsed_seconds`.
+Returns a dict with: `dataset_name`, `estimatedQubits`, `standardDeviation`, `samples`, `features`, `classes`, `plotData`, `elapsed_seconds`.
 
 ---
 
@@ -125,7 +125,7 @@ train_id = result['train_id']
 print(result['elapsed_seconds'])
 ```
 
-Returns a dict with: `train_id`, `best_test_accuracy`, `layers_completed`, `elapsed_seconds`, and other training summary fields.
+Returns a dict with: `train_id`, `total_layers`, `elapsed_seconds`, `data_loading_seconds`.
 
 The `train_id` is used for inference and explainable AI calls.
 
@@ -159,7 +159,12 @@ Commonly used settings keys:
 | `normalize` | `True` | Normalize data to [0, 1] range |
 | `circuit_structure` | `"bipartite"` | Circuit structure type |
 | `ansatz_type` | `"euler_and_heisenberg"` | Gate ansatz for parameterized circuits |
+| `activation_type` | `"discretize"` | Activation function type |
 | `parallelize` | `False` | Parallelize circuit execution |
+| `all_nodes` | `False` | Optimize all nodes (ignores `num_iterations`) |
+| `node_order_type` | `"sequential"` | Order in which optimizer visits nodes |
+| `bits_type` | `"importance"` | How features are mapped to qubits |
+| `num_pca` | auto | Number of PCA components (None = auto) |
 
 ---
 
@@ -195,10 +200,10 @@ List all trained models currently on the server.
 ```python
 models = client.inference.models()
 for m in models['models']:
-    print(m['train_id'], m.get('dataset_display_name'), m.get('status'))
+    print(m['train_id'], m.get('dataset_display_name'), m.get('num_qubits'), m.get('layers'))
 ```
 
-Returns a dict with a `models` list.
+Returns a dict with a `models` list. Each model entry includes `train_id`, `dataset`, `dataset_display_name`, `dataset_name`, `num_qubits`, `layers` (list of completed layer numbers), `max_layer`, `node_count`, `node_order`, `timestamp`, `non_defaults`, `training_params`.
 
 ---
 
@@ -227,7 +232,7 @@ for qid, val in explanation['convergence'].items():
     print(f"Class qubit {qid}: convergence = {val:.4f}")
 ```
 
-Returns a dict with: `dataset_name`, `num_qubits`, `num_class_qubits`, `qubit_map` (list of dicts with `qubit`, `feature_name`, `feature_index`, `importance`), `convergence` (dict mapping class qubit IDs to convergence values), `distributions`, `feature_indices`, `elapsed_seconds`.
+Returns a dict with: `train_id`, `layer`, `dataset_name`, `num_qubits`, `num_class_qubits`, `class_range`, `qubit_map` (list of dicts with `qubit`, `feature_index`, `feature_name`, `bits`, `bit`, `importance`), `convergence` (dict mapping class qubit IDs to convergence values), `distributions`, `feature_indices`, `data_loading_seconds`, `elapsed_seconds`.
 
 ---
 
@@ -307,6 +312,8 @@ See `redcedar-examples/01_full_pipeline.ipynb` for a complete walkthrough with o
 - **One job at a time.** The server processes jobs sequentially. If you submit a request while another job is running, yours is queued and starts when the current job finishes.
 
 - **Datasets are server-managed.** You can select from the server's dataset catalog but cannot yet upload custom datasets or plug in your own data loaders through the SDK. The web UI supports CSV uploads; SDK support for this is planned.
+
+- **OpenML datasets only.** The SDK currently requests all datasets via OpenML. Datasets in the server catalog that are stored as local files (not sourced from OpenML) may not load correctly through the SDK. The standard catalog datasets (wdbc, iris, diabetes, wine, mnist) all work.
 
 - **No job cancellation from the SDK.** Training jobs can be stopped from the web UI, but the SDK does not currently expose a stop function.
 
