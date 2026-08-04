@@ -98,6 +98,14 @@ class RedCedarClient:
         if not job_id:
             return result
 
+        # Trigger server-side queue cleanup and job launch before connecting
+        # to SSE. Without this, stale queue entries from prior jobs block
+        # new jobs from starting and training_state is never populated.
+        try:
+            self._get("/jobs/status")
+        except Exception:
+            pass
+
         for event in self._stream_sse(stream_path.format(job_id=job_id)):
             etype = event.get("_event", event.get("type", ""))
 
