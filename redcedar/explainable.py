@@ -7,7 +7,7 @@ class ExplainableManager:
     def __init__(self, client):
         self._client = client
 
-    def run(self, train_id, verbose=False, on_progress=None):
+    def run(self, train_id, verbose=False, on_progress=None, settings=None):
         """Run explainable AI analysis on a trained model.
 
         Constructs quantum circuits to identify which input
@@ -17,15 +17,19 @@ class ExplainableManager:
             train_id: Training job ID (from training.run() result).
             verbose: Print progress to stdout.
             on_progress: Callback(percent, message) for progress updates.
+            settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 
         Returns:
             Dict with qubit_map (feature importance per qubit),
             distributions, convergence values, feature_indices, etc.
         """
+        body = {"train_id": train_id, "user_id": "sdk"}
+        if settings:
+            body["settings"] = settings
         return self._client._run_job(
             "/applications/explainable",
             "/applications/explainable/{job_id}/stream",
-            body={"train_id": train_id, "user_id": "sdk"},
+            body=body,
             verbose=verbose,
             on_progress=on_progress,
         )
