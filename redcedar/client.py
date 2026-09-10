@@ -122,6 +122,12 @@ class RedCedarClient:
                     print(f"\r  [100%] Done.{'':40}")
                 return event.get("summary", event)
 
+            elif etype == "log":
+                if verbose:
+                    msg = event.get("message", "")
+                    if msg:
+                        print(f"  {msg}")
+
             elif etype == "error":
                 msg = event.get("message", "Job failed")
                 if verbose:
