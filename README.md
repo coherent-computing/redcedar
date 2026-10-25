@@ -163,6 +163,8 @@ Commonly used settings keys:
 | `parallelize` | `False` | Parallelize circuit execution |
 | `all_nodes` | `False` | Optimize all nodes (ignores `num_iterations`) |
 | `node_order_type` | `"sequential"` | Order in which optimizer visits nodes |
+| `op_direction` | `"backward"` | Order of the ansatz operators over the data qubits (`"backward"` or `"forward"`) |
+| `seed` | `None` | Seed for the initial parameters, so runs can be repeated (`None` = random start) |
 | `bits_type` | `"importance"` | How features are mapped to qubits |
 | `num_pca` | auto | Number of PCA components (None = auto) |
 
