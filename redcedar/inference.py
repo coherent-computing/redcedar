@@ -12,7 +12,7 @@ class InferenceManager:
 
         Args:
             train_id: Training job ID (from training.run() result).
-            layer: Optional layer number to run inference on (default: best layer).
+            layer: Optional layer number to run inference on (default: highest layer).
             verbose: Print progress to stdout.
             on_progress: Callback(percent, message) for progress updates.
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).

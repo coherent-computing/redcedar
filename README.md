@@ -4,11 +4,13 @@ Python client for the Red Cedar quantum machine learning server. Run dataset ana
 
 ## Install
 
+From a clone of this repository:
+
 ```bash
 pip install -e .
 ```
 
-The only dependency is `requests`.
+The only dependency is `requests`. The example notebooks also plot with matplotlib, which you can install with the client: `pip install -e ".[plotting]"`.
 
 ## Connecting to the Server
 
@@ -84,12 +86,12 @@ Returns a dict with: `dataset_name`, `features`, `samples`, `n_components`, `var
 
 ### `client.analysis.mi(dataset_id)`
 
-Mutual Information analysis. Ranks features by how strongly they predict the class label.
+Mutual Information analysis. The data is first reduced with PCA, as training does, and each principal component (`PC1`, `PC2`, ...) is ranked by how strongly it predicts the class label.
 
 ```python
 mi = client.analysis.mi("wdbc", verbose=True)
 print(mi['total_mi'])               # 1.3392
-print(mi['thresholds']['90'])       # 17 (features for 90% of total MI)
+print(mi['thresholds']['90'])       # 17 (components for 90% of total MI)
 for f in mi['ranked_features'][:5]:
     print(f['feature_name'], f['mi_score'])
 ```
@@ -98,7 +100,7 @@ Returns a dict with: `dataset_name`, `samples`, `features`, `classes`, `total_mi
 
 ### `client.analysis.qre(dataset_id)`
 
-Quantum Resource Estimation. Estimates how many qubits the model needs for this dataset.
+Quantum Resource Estimation. Estimates how many qubits the model needs for this dataset: the data is encoded with more and more qubits until no two samples with different classes look the same (so 100% accuracy is possible in principle), plus the qubits needed for the class label. The result is averaged over 10 random train/test splits.
 
 ```python
 qre = client.analysis.qre("wdbc", verbose=True)
@@ -106,7 +108,9 @@ print(qre['estimatedQubits'])       # 16
 print(qre['standardDeviation'])     # 1.4
 ```
 
-Returns a dict with: `dataset_name`, `estimatedQubits`, `standardDeviation`, `samples`, `features`, `classes`, `plotData`, `elapsed_seconds`.
+Returns a dict with: `dataset_name`, `estimatedQubits`, `standardDeviation`, `samples`, `features`, `classes`, `plotData`, `warning_message` (or `None`), `elapsed_seconds`. `plotData` has one entry per number of data qubits, with the highest possible accuracy on the training and test data (`Number of Qubits`, `Train`, `Train sem`, `Test`, `Test sem`, and the overlap measures).
+
+The analysis functions accept catalog IDs and IDs from `datasets.upload()`.
 
 ---
 
@@ -175,7 +179,7 @@ Returns a dict with: `train_id`, `layer`, `num_checkpoints`, `accuracy_history`,
 
 ### Settings overrides
 
-Settings can be a Python dict, a path to a `.json` file, or a path to a `.toml` file. Only the keys you include are changed; everything else keeps the server default.
+Settings can be a Python dict, a path to a `.json` file, or a path to a `.toml` file. Only the keys you include are changed; everything else keeps the server default. Keys the server doesn't recognize are ignored without an error, so check the spelling against the table below.
 
 ```python
 # Dict
@@ -195,6 +199,7 @@ Commonly used settings keys:
 | `num_qubits` | 4 | Number of qubits in the quantum circuit |
 | `min_layers` | 1 | First layer in the layer sweep |
 | `max_layers` | 2 | Last layer in the layer sweep |
+| `chain_layers` | `True` | Start each layer from the parameters the previous layer found (`False` = each layer starts from scratch) |
 | `backend` | `"statevector"` | Execution backend (`"statevector"`, `"ionq-simulator"`, etc.) |
 | `num_iterations` | all nodes | Number of optimizer iterations per layer |
 | `scale` | `True` | Whether to scale features before PCA |
@@ -205,6 +210,7 @@ Commonly used settings keys:
 | `ansatz_type` | `"euler_and_heisenberg"` | Gate ansatz for parameterized circuits |
 | `activation_type` | `"discretize"` | Activation function type |
 | `parallelize` | `False` | Parallelize circuit execution |
+| `batch_size` | `None` | Training samples per batch (`None` = all training data) |
 | `all_nodes` | `False` | Optimize all nodes (ignores `num_iterations`) |
 | `node_order_type` | `"sequential"` | Order in which optimizer visits nodes |
 | `op_direction` | `"backward"` | Order of the ansatz operators over the data qubits (`"backward"` or `"forward"`) |
@@ -216,15 +222,17 @@ Commonly used settings keys:
 
 ## Inference
 
-### `client.inference.run(train_id, verbose=False, on_progress=None)`
+### `client.inference.run(train_id, layer=None, verbose=False, on_progress=None, settings=None)`
 
 Run the trained model on held-out test data and get accuracy results.
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `train_id` | str | required | Training job ID from `training.run()` |
+| `layer` | int | highest layer | Which layer of the trained model to test |
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
+| `settings` | dict | `None` | Run-time overrides; only `backend` and `parallelize` are used, e.g. to test on a different backend |
 
 ```python
 inference = client.inference.run(train_id, verbose=True)
@@ -241,7 +249,7 @@ Returns a dict with: `train_id`, `layer`, `overall_accuracy`, `overall_loss`, `t
 
 ### `client.inference.models()`
 
-List all trained models currently on the server.
+List the six most recently trained models on the server. Older models stay on the server and can still be used by `train_id`.
 
 ```python
 models = client.inference.models()
@@ -255,15 +263,16 @@ Returns a dict with a `models` list. Each model entry includes `train_id`, `data
 
 ## Explainable AI
 
-### `client.explainable.run(train_id, verbose=False, on_progress=None)`
+### `client.explainable.run(train_id, verbose=False, on_progress=None, settings=None)`
 
-Analyze which input features drive the model's classification decisions.
+Analyze which input features drive the model's classification decisions. It uses the highest layer of the trained model. Each data qubit is mapped back to the input feature it encodes, and `importance` measures how much that qubit influences the prediction.
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `train_id` | str | required | Training job ID from `training.run()` |
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
+| `settings` | dict | `None` | Run-time overrides; only `backend` and `parallelize` are used |
 
 ```python
 explanation = client.explainable.run(train_id, verbose=True)
@@ -286,10 +295,12 @@ Returns a dict with: `train_id`, `layer`, `dataset_name`, `num_qubits`, `num_cla
 
 All long-running operations accept `verbose` and `on_progress`:
 
-- **`verbose=True`** prints a single updating line to stdout: `[  30%] Training layer 1...`
+- **`verbose=True`** prints a single updating line to stdout, `[  30%] Layer 1/2`, plus the server's log lines for the job (training output, per-layer results).
 - **`on_progress`** receives `(percent, message)` on each update, for custom progress handling (GUI bars, logging, etc.)
 
 These can be used together.
+
+If the server is busy with another job, yours waits in the queue and starts when that job finishes. The call simply waits; with `verbose=True` it prints `Waiting in queue...` until the job starts.
 
 ```python
 def my_callback(percent, message):
@@ -306,7 +317,7 @@ The client raises standard Python exceptions:
 
 - **`requests.ConnectionError`** — cannot reach the server. Use `client.status()` to check before starting work.
 - **`requests.HTTPError`** — server returned an error (e.g., 404 if a training job doesn't exist, 401 for bad API key).
-- **`RuntimeError`** — a job failed during execution. The error message from the server is included.
+- **`RuntimeError`** — a job failed during execution (the error message from the server is included), or it was stopped with `training.stop()` (`"Training stopped"`).
 
 ```python
 try:
@@ -347,7 +358,16 @@ for q in explanation['qubit_map']:
     print(f"  {q['feature_name']}: {q['importance']*100:.1f}%")
 ```
 
-See `redcedar-examples/01_full_pipeline.ipynb` for a complete walkthrough with output.
+## Example Notebooks
+
+The [redcedar-examples](https://github.com/coherent-computing/redcedar-examples) repository has notebooks that use this client:
+
+| Notebook | Shows |
+|----------|-------|
+| `01_quick_start.ipynb` | The basic workflow: train, plot the training curves, test, explain |
+| `02_dataset_analysis.ipynb` | PCA, mutual information and qubit estimates, comparing datasets, analyzing your own CSV |
+| `03_training_settings.ipynb` | Training settings, one section per setting |
+| `04_training_in_depth.ipynb` | Layers and chaining, test accuracy during training, choosing the data, reusing models, stopping a job |
 
 ---
 
