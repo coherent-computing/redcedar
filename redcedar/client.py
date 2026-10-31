@@ -60,6 +60,18 @@ class RedCedarClient:
         resp.raise_for_status()
         return resp.json()
 
+    def _post_file(self, path, file_path):
+        """Upload a file as multipart form data (field name 'file')."""
+        headers = {"x-api-key": self.api_key} if self.api_key else {}
+        with open(file_path, "rb") as f:
+            resp = requests.post(
+                f"{self.url}{path}",
+                headers=headers,
+                files={"file": (os.path.basename(file_path), f)},
+            )
+        resp.raise_for_status()
+        return resp.json()
+
     def _open_stream(self, path, verbose=False):
         """Open a job's SSE stream. A queued job has no stream until it starts
         (the server answers 404), so wait for it to start."""
@@ -109,8 +121,12 @@ class RedCedarClient:
             elif line.startswith("data: "):
                 data_buf = line[6:]
 
-    def _run_job(self, post_path, stream_path, body=None, verbose=False, on_progress=None):
-        """Start a job via POST, consume SSE until done. Returns summary."""
+    def _run_job(self, post_path, stream_path, body=None, verbose=False, on_progress=None,
+                 events=None):
+        """Start a job via POST, consume SSE until done. Returns summary.
+
+        If events is a list, every other event the job sends (e.g. training
+        datapoints and validation results) is appended to it."""
         result = self._post(post_path, body)
         job_id = result.get("job_id") or result.get("train_id")
         self._last_job_id = job_id
@@ -152,6 +168,15 @@ class RedCedarClient:
                 if verbose:
                     print(f"\n  ERROR: {msg}")
                 raise RuntimeError(msg)
+
+            elif etype == "stopped":
+                msg = event.get("message", "Job stopped")
+                if verbose:
+                    print(f"\n  {msg}")
+                raise RuntimeError(msg)
+
+            elif events is not None:
+                events.append(event)
 
         raise RuntimeError("SSE stream ended without done/error event")
 

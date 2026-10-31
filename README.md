@@ -46,7 +46,16 @@ for ds in datasets:
 
 Each entry is a dict. The most useful fields: `id`, `name`, `description`, `category`, `source`, `rows`, `columns`, `classes`, `available`. Some datasets include additional fields like `recommended` or `dataset_name`.
 
-The `id` is what you pass to analysis and training functions (e.g., `"wdbc"`, `"iris"`, `"diabetes"`).
+The `id` is what you pass to analysis and training functions (e.g., `"wdbc"`, `"iris"`, `"diabetes"`, `"clinical_trial_v1"`).
+
+### `client.datasets.upload(file_path)`
+
+Uploads a CSV file and returns a dataset ID to pass to `training.run()`. The last column is the class label; a header row is optional.
+
+```python
+dataset_id = client.datasets.upload("my_data.csv")
+result = client.training.run(dataset_id, settings={"num_qubits": 4})
+```
 
 ---
 
@@ -103,16 +112,19 @@ Returns a dict with: `dataset_name`, `estimatedQubits`, `standardDeviation`, `sa
 
 ## Training
 
-### `client.training.run(dataset_id, settings=None, verbose=False, on_progress=None)`
+### `client.training.run(dataset_id, settings=None, verbose=False, on_progress=None, train_size=None, test_size=None, class_range=None)`
 
 Train a quantum ML model on a dataset.
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
-| `dataset_id` | str | required | Dataset ID from the catalog |
+| `dataset_id` | str | required | Dataset ID from the catalog, an ID from `datasets.upload()`, or an OpenML dataset name |
 | `settings` | dict, str, or None | `None` | Override default training parameters (see below) |
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
+| `train_size` | float or int | dataset default | Training set size (fraction or number of samples) |
+| `test_size` | float or int | dataset default | Test set size (fraction or number of samples) |
+| `class_range` | list | all classes | Classes to train on, e.g. `["0", "1"]` (catalog datasets only) |
 
 ```python
 result = client.training.run("wdbc", verbose=True, settings={
@@ -125,9 +137,41 @@ train_id = result['train_id']
 print(result['elapsed_seconds'])
 ```
 
-Returns a dict with: `train_id`, `total_layers`, `elapsed_seconds`, `data_loading_seconds`.
+Returns a dict with: `train_id`, `total_layers`, `elapsed_seconds`, `data_loading_seconds`, plus:
+
+- `history`: the training curves, by layer. Each layer has a list of `{iteration, train_loss, train_accuracy}`.
+- `validation`: the test results at the end of each layer, by layer: `test_loss`, `test_accuracy`, `test_accuracy_per_class`, `test_loss_per_class`, `num_parameters` and timings.
+
+```python
+import matplotlib.pyplot as plt
+
+for layer, points in result['history'].items():
+    plt.plot([p['train_loss'] for p in points], label=f"layer {layer}")
+plt.xlabel("Iteration"); plt.ylabel("Training loss"); plt.legend()
+
+for layer, v in result['validation'].items():
+    print(f"Layer {layer}: test accuracy {v['test_accuracy']:.1%}")
+```
 
 The `train_id` is used for inference and explainable AI calls.
+
+### `client.training.analyze(train_id, layer=None, verbose=False, on_progress=None)`
+
+Replays the parameters saved during training on the test data, giving the test accuracy and loss over the course of training. `layer` defaults to the last layer.
+
+```python
+replay = client.training.analyze(train_id)
+plt.plot(replay['accuracy_history'])
+plt.xlabel("Checkpoint"); plt.ylabel("Test accuracy")
+```
+
+Returns a dict with: `train_id`, `layer`, `num_checkpoints`, `accuracy_history`, `loss_history`, `final_accuracy`, `final_loss`, `data_loading_seconds`, `replay_seconds`, `elapsed_seconds`.
+
+### `client.training.status(train_id)` and `client.training.stop(train_id)`
+
+`status()` returns `train_id`, `status` (`running`, `completed`, `failed` or `stopped`), `progress`, `summary` and `error_message`. A job still waiting in the queue has no status yet (404).
+
+`stop()` asks the server to stop a running job; finished layers are kept. Since `training.run()` waits until the job ends, call `stop()` from another thread, notebook or process. The waiting `training.run()` then raises `RuntimeError("Training stopped")`.
 
 ### Settings overrides
 
@@ -313,17 +357,14 @@ See `redcedar-examples/01_full_pipeline.ipynb` for a complete walkthrough with o
 
 - **One job at a time.** The server processes jobs sequentially. If you submit a request while another job is running, yours is queued and starts when the current job finishes.
 
-- **Datasets are server-managed.** You can select from the server's dataset catalog but cannot yet upload custom datasets or plug in your own data loaders through the SDK. The web UI supports CSV uploads; SDK support for this is planned.
+- **CSV uploads only.** You can train on catalog datasets and on CSV files you upload, but you can't yet plug in your own data loaders.
 
-- **OpenML datasets only.** The SDK currently requests all datasets via OpenML. Datasets in the server catalog that are stored as local files (not sourced from OpenML) may not load correctly through the SDK. The standard catalog datasets (wdbc, iris, diabetes, wine, mnist) all work.
-
-- **No job cancellation from the SDK.** Training jobs can be stopped from the web UI, but the SDK does not currently expose a stop function.
+- **Only training can be stopped.** Inference, explainable AI and the training replay can't be stopped once they start.
 
 ## Planned Enhancements
 
 - Regression as a task type (in addition to classification)
-- Custom dataset uploads and user-provided data loaders
-- Job cancellation from the SDK
+- User-provided data loaders
 - Access to additional server-side customization (preprocessing pipelines, circuit structure options)
 
 ## Requirements
