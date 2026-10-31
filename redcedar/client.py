@@ -2,6 +2,7 @@
 
 import os
 import json
+import time
 import requests
 
 from .datasets import DatasetManager
@@ -59,14 +60,32 @@ class RedCedarClient:
         resp.raise_for_status()
         return resp.json()
 
-    def _stream_sse(self, path):
+    def _open_stream(self, path, verbose=False):
+        """Open a job's SSE stream. A queued job has no stream until it starts
+        (the server answers 404), so wait for it to start."""
+        while True:
+            resp = requests.get(
+                f"{self.url}{path}",
+                headers=self._headers(),
+                stream=True,
+            )
+            if resp.status_code != 404:
+                resp.raise_for_status()
+                return resp
+            resp.close()
+
+            # Also launches the next queued job on servers that only do so on a request.
+            qs = self._get("/jobs/status")
+            if not qs.get("total"):
+                # Nothing queued or running, so the job is gone
+                resp.raise_for_status()
+            if verbose:
+                print("\r  Waiting in queue...", end="", flush=True)
+            time.sleep(2)
+
+    def _stream_sse(self, path, verbose=False):
         """Consume an SSE stream, yielding parsed events."""
-        resp = requests.get(
-            f"{self.url}{path}",
-            headers=self._headers(),
-            stream=True,
-        )
-        resp.raise_for_status()
+        resp = self._open_stream(path, verbose)
 
         event_type = "message"
         data_buf = ""
@@ -106,7 +125,7 @@ class RedCedarClient:
         except Exception:
             pass
 
-        for event in self._stream_sse(stream_path.format(job_id=job_id)):
+        for event in self._stream_sse(stream_path.format(job_id=job_id), verbose):
             etype = event.get("_event", event.get("type", ""))
 
             if etype == "progress":
