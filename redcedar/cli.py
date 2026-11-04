@@ -32,6 +32,10 @@ def main(argv=None):
     t.add_argument("--layers", type=int, help="train layers 1 to N (min_layers=1, max_layers=N)")
     t.add_argument("--seed", type=int, help="seed for the initial parameters")
     t.add_argument("--backend", help="where the circuits run (default: statevector)")
+    t.add_argument("--task", choices=["classification", "regression"],
+                   help="default: detected from the target column")
+    t.add_argument("--test-size", type=float,
+                   help="held-out test rows, a fraction or a count (0 = train on all rows)")
 
     e = sub.add_parser("evaluate", help="score a model on its held-out test rows")
     e.add_argument("train_id")
@@ -64,15 +68,28 @@ def main(argv=None):
                 settings["seed"] = args.seed
             if args.backend:
                 settings["backend"] = args.backend
-            result = client.training.run(args.data, settings=settings, verbose=verbose)
+            test_size = args.test_size
+            if test_size is not None and test_size >= 1:
+                test_size = int(test_size)
+            result = client.training.run(args.data, settings=settings, verbose=verbose,
+                                         task=args.task, test_size=test_size)
             for layer, v in result.get("validation", {}).items():
-                print(f"Layer {layer}: test accuracy {v['test_accuracy']:.1%}")
+                if v.get("test_accuracy") is not None:
+                    print(f"Layer {layer}: test accuracy {v['test_accuracy']:.1%}")
+                elif v.get("test_loss") is not None:
+                    print(f"Layer {layer}: test loss {v['test_loss']:.4f}")
+                else:
+                    print(f"Layer {layer}: trained on all rows (no test set)")
             print(f"train_id: {result['train_id']}")
 
         elif args.command == "evaluate":
             report = client.training.evaluate(args.train_id, layer=args.layer, verbose=verbose,
                                               settings=run_settings)
-            print(f"Accuracy {report['overall_accuracy']:.1%} on {report['test_samples']} test rows")
+            if report.get("task") == "regression":
+                print(f"Mean absolute error {report['mean_absolute_error']:.4f}, "
+                      f"loss {report['overall_loss']:.4f} on {report['test_samples']} test rows")
+            else:
+                print(f"Accuracy {report['overall_accuracy']:.1%} on {report['test_samples']} test rows")
             for c in report["per_class"]:
                 print(f"  class {c['class']}: {c['accuracy']:.1%} ({c['samples']} rows)")
 
@@ -87,11 +104,13 @@ def main(argv=None):
                     print(p_row["prediction"])
             if "accuracy" in result:
                 print(f"Accuracy on these rows: {result['accuracy']:.1%}")
+            if "mean_absolute_error" in result:
+                print(f"Mean absolute error on these rows: {result['mean_absolute_error']:.4f}")
 
         elif args.command == "models":
             for m in client.inference.models()["models"]:
                 print(m["train_id"], m.get("dataset_display_name") or m.get("dataset", ""),
-                      f"{m.get('num_qubits')} qubits", f"layers {m.get('layers')}")
+                      m.get("task", ""), f"{m.get('num_qubits')} qubits", f"layers {m.get('layers')}")
 
     except (RuntimeError, requests.HTTPError, requests.ConnectionError) as err:
         print(f"Error: {err}", file=sys.stderr)

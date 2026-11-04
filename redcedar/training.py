@@ -15,7 +15,7 @@ class TrainingManager:
         self._client = client
 
     def run(self, dataset_id, settings=None, verbose=False, on_progress=None,
-            train_size=None, test_size=None, class_range=None):
+            train_size=None, test_size=None, class_range=None, task=None):
         """Train a model on a dataset.
 
         Args:
@@ -27,16 +27,20 @@ class TrainingManager:
             verbose: Print progress to stdout.
             on_progress: Callback(percent, message) for progress updates.
             train_size: Optional training set size (fraction or count).
-            test_size: Optional test set size (fraction or count).
+            test_size: Optional test set size (fraction or count). 0 trains on
+                       all rows; there is then no test set and no test results.
             class_range: Optional list of classes to use (e.g. ['0', '1']).
                          Not used for uploaded datasets.
+            task: 'classification' or 'regression'. Default: detected from the
+                  target column (text or whole numbers are classes, so pass
+                  task='regression' for whole-number targets).
 
         Returns:
             Dict with train_id, total_layers, elapsed_seconds, etc., plus
             history (training loss/accuracy per iteration, by layer) and
             validation (test results at the end of each layer, by layer).
         """
-        params = load_settings(settings)
+        params = dict(load_settings(settings))   # a copy: the caller's dict stays as it was
         dataset_id = self._client.datasets._as_id(dataset_id)
         ds = self._dataset_selection(dataset_id)
         if train_size is not None:
@@ -46,6 +50,8 @@ class TrainingManager:
         if class_range is not None:
             ds["class_range"] = list(class_range)
         params["dataset_selection"] = ds
+        if task is not None:
+            params["task"] = task
 
         events = []
         result = self._client._run_job(

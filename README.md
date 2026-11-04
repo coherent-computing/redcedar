@@ -120,7 +120,7 @@ The analysis functions accept catalog IDs and IDs from `datasets.upload()`.
 
 ## Training
 
-### `client.training.run(dataset_id, settings=None, verbose=False, on_progress=None, train_size=None, test_size=None, class_range=None)`
+### `client.training.run(dataset_id, settings=None, verbose=False, on_progress=None, train_size=None, test_size=None, class_range=None, task=None)`
 
 Train a quantum ML model on a dataset.
 
@@ -131,8 +131,9 @@ Train a quantum ML model on a dataset.
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
 | `train_size` | float or int | dataset default | Training set size (fraction or number of samples) |
-| `test_size` | float or int | dataset default | Test set size (fraction or number of samples) |
+| `test_size` | float or int | dataset default | Test set size (fraction or number of samples); `0` trains on all rows, with no test set |
 | `class_range` | list | all classes | Classes to train on, e.g. `["0", "1"]` (catalog datasets only) |
+| `task` | str | detected | `"classification"` or `"regression"`. Detected from a CSV file's target column: text or whole numbers are classes, fractional numbers regression. Pass `task="regression"` for a whole-number target that is a quantity |
 
 ```python
 result = client.training.run("wdbc", verbose=True, settings={
@@ -186,7 +187,7 @@ for cls in report['per_class']:
     print(f"Class {cls['class']}: {cls['accuracy']:.1%} ({cls['samples']} samples)")
 ```
 
-Returns a dict with: `train_id`, `layer`, `overall_accuracy`, `overall_loss`, `test_samples`, `num_classes`, `per_class` (list of dicts with `class`, `accuracy`, `loss`, `samples`), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`. At most 400 test rows are scored.
+Returns a dict with: `train_id`, `layer`, `task`, `overall_accuracy`, `overall_loss`, `test_samples`, `num_classes`, `per_class` (list of dicts with `class`, `accuracy`, `loss`, `samples`), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`. For a regression model, `overall_accuracy` is `None`, `per_class` is empty, and `mean_absolute_error` gives the average error in the target's units. At most 400 test rows are scored. A model trained with `test_size=0` has no test rows: the call stops with an error.
 
 ### `client.training.analyze(train_id, layer=None, verbose=False, on_progress=None)`
 
@@ -272,7 +273,7 @@ for row in predictions['predictions'][:5]:
     print(row['prediction'], row['probabilities'])   # B {'B': 0.94, 'M': 0.06}
 ```
 
-Returns a dict with: `train_id`, `layer`, `task` (`"classification"`), `rows`, `predictions` (one dict per row, in file order, with `prediction` and `probabilities`, class label to probability), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`, and `accuracy` when the rows include the target column. The `output` file has the input columns plus `prediction` and one `probability_<class>` column per class.
+Returns a dict with: `train_id`, `layer`, `task`, `rows`, `predictions` (one dict per row, in file order), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`. Classification: each row has `prediction` (the label) and `probabilities` (class label to probability), and the result has `accuracy` when the rows include the target column. Regression: each row has `prediction` (a number), and the result has `mean_absolute_error` when the rows include the target column. The `output` file has the input columns plus `prediction` and, for classification, one `probability_<class>` column per class.
 
 The new file's columns are matched to the model's inputs:
 
@@ -406,7 +407,7 @@ redcedar predict <train_id> new_data.csv -o predictions.csv
 redcedar models
 ```
 
-`train` also takes `--settings my_settings.toml` (any setting) and `--backend`; `evaluate` and `predict` take `--layer` and `--backend`. Run `redcedar <command> --help` for the details.
+`train` also takes `--settings my_settings.toml` (any setting), `--backend`, `--task regression` and `--test-size 0` (train on all rows); `evaluate` and `predict` take `--layer` and `--backend`. Run `redcedar <command> --help` for the details.
 
 ## Example Notebooks
 
@@ -423,7 +424,7 @@ The [redcedar-examples](https://github.com/coherent-computing/redcedar-examples)
 
 ## Current Limitations
 
-- **Classification only.** The server currently supports classification tasks. Regression support is planned.
+- **Explainable AI is for classification models.** Regression models train, evaluate (loss and mean absolute error) and predict (a number per row); explainable AI refuses them.
 
 - **One job at a time.** The server processes jobs sequentially. If you submit a request while another job is running, yours is queued and starts when the current job finishes.
 
@@ -433,11 +434,10 @@ The [redcedar-examples](https://github.com/coherent-computing/redcedar-examples)
 
 - **Trained models are not kept forever.** When it starts, the server deletes trained models older than 24 hours, and all but the 30 most recent.
 
-- **The test split is always used.** `test_size=0` (training on all rows) is not supported yet.
+- **No test set with `test_size=0`.** The layer results' test values are `None`, and `training.evaluate()` and `training.analyze()` stop with an error; measure such a model with `inference.run()` on rows that include the target column.
 
 ## Planned Enhancements
 
-- Regression as a task type (in addition to classification)
 - User-provided data loaders
 - Access to additional server-side customization (preprocessing pipelines, circuit structure options)
 

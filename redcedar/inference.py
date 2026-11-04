@@ -29,9 +29,11 @@ class InferenceManager:
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 
         Returns:
-            Dict with train_id, layer, task, rows, accuracy (when the target
-            column is present), and predictions: one dict per row with
-            'prediction' and 'probabilities' (class label to probability).
+            Dict with train_id, layer, task, rows, and predictions: one dict per
+            row. Classification: 'prediction' (the label) and 'probabilities'
+            (class label to probability); 'accuracy' when the target column is
+            present. Regression: 'prediction' (a number); 'mean_absolute_error'
+            when the target column is present.
         """
         data_path = os.fspath(data) if output and isinstance(data, (str, os.PathLike)) else None
         body = {"train_id": train_id, "user_id": "sdk",
@@ -83,7 +85,8 @@ def _write_predictions(data_path, predictions, output):
     if len(body) != len(predictions):
         raise ValueError(f"{len(body)} rows in {data_path}, {len(predictions)} predictions")
 
-    classes = sorted({c for p in predictions for c in p["probabilities"]})
+    # Regression predictions have no class probabilities, so no probability columns
+    classes = sorted({c for p in predictions for c in p.get("probabilities", {})})
     with open(output, "w", newline="") as f:
         w = csv.writer(f)
         if header:
