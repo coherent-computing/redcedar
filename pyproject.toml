@@ -15,6 +15,9 @@ dependencies = [
     "requests>=2.28",
 ]
 
+[project.scripts]
+redcedar = "redcedar.cli:main"
+
 [project.optional-dependencies]
 plotting = ["matplotlib>=3.5"]
 

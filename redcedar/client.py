@@ -12,17 +12,26 @@ from .inference import InferenceManager
 from .explainable import ExplainableManager
 
 
-def connect(url=None, api_key=None):
+def connect(url=None, api_key=None, local=False):
     """Create a RedCedarClient connected to the server.
 
     Args:
-        url: Server URL. Defaults to REDCEDAR_URL env var or http://localhost:8000.
+        url: Server URL. Defaults to REDCEDAR_URL env var or http://localhost:8002
+             (the port run_server uses).
         api_key: API key. Defaults to REDCEDAR_API_KEY env var.
+        local: For development with the Red Cedar source. True (or the path of a
+               red-cedar folder) starts the server inside this Python process, so
+               breakpoints in the Red Cedar code work. The folder defaults to the
+               REDCEDAR_CORE_PATH env var, or must already be importable.
 
     Returns:
         RedCedarClient instance.
     """
-    url = url or os.environ.get("REDCEDAR_URL", "http://localhost:8000")
+    if local:
+        from .local import start_local_server
+        url, api_key = start_local_server(None if local is True else local)
+        return RedCedarClient(url, api_key)
+    url = url or os.environ.get("REDCEDAR_URL", "http://localhost:8002")
     api_key = api_key or os.environ.get("REDCEDAR_API_KEY", "")
     return RedCedarClient(url, api_key)
 

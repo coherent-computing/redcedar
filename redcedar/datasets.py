@@ -1,5 +1,7 @@
 """Dataset listing and selection."""
 
+import os
+
 
 class DatasetManager:
     """Access the dataset catalog on the server."""
@@ -27,3 +29,10 @@ class DatasetManager:
             The dataset ID to pass to training.run().
         """
         return self._client._post_file("/upload", file_path)["jobId"]
+
+    def _as_id(self, data):
+        """A CSV file path is uploaded and replaced by its dataset ID; anything
+        else (a catalog ID or an upload ID) is returned as it is."""
+        if isinstance(data, os.PathLike) or (isinstance(data, str) and os.path.isfile(data)):
+            return self.upload(os.fspath(data))
+        return data

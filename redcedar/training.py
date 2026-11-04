@@ -19,8 +19,9 @@ class TrainingManager:
         """Train a model on a dataset.
 
         Args:
-            dataset_id: Dataset ID from the catalog (e.g., 'wdbc'), an ID returned
-                        by datasets.upload(), or any OpenML dataset name.
+            dataset_id: A CSV file path (uploaded first), a dataset ID from the
+                        catalog (e.g., 'wdbc'), an ID returned by
+                        datasets.upload(), or any OpenML dataset name.
             settings: Optional overrides — dict, .json path, or .toml path.
                       Only specified keys override server defaults.
             verbose: Print progress to stdout.
@@ -36,6 +37,7 @@ class TrainingManager:
             validation (test results at the end of each layer, by layer).
         """
         params = load_settings(settings)
+        dataset_id = self._client.datasets._as_id(dataset_id)
         ds = self._dataset_selection(dataset_id)
         if train_size is not None:
             ds["train_size"] = train_size
@@ -75,6 +77,35 @@ class TrainingManager:
         result["validation"] = validation
 
         return result
+
+    def evaluate(self, train_id, layer=None, verbose=False, on_progress=None, settings=None):
+        """Score a trained model on the test rows held back from its training run.
+
+        No data is passed: the server rebuilds the same split from the model's
+        saved settings. For a prediction per row on new data, use inference.run().
+
+        Args:
+            train_id: Training job ID (from training.run() result).
+            layer: Optional layer number to score (default: highest layer).
+            verbose: Print progress to stdout.
+            on_progress: Callback(percent, message) for progress updates.
+            settings: Optional dict of runtime overrides (e.g. backend, parallelize).
+
+        Returns:
+            Dict with overall_accuracy, overall_loss, per_class results, etc.
+        """
+        body = {"train_id": train_id, "user_id": "sdk"}
+        if layer is not None:
+            body["layer"] = layer
+        if settings:
+            body["settings"] = settings
+        return self._client._run_job(
+            "/inference",
+            "/inference/{job_id}/stream",
+            body=body,
+            verbose=verbose,
+            on_progress=on_progress,
+        )
 
     def analyze(self, train_id, layer=None, verbose=False, on_progress=None):
         """Replay a trained model's saved parameters on the test data, giving

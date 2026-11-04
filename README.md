@@ -30,7 +30,11 @@ export REDCEDAR_API_KEY="your-api-key"
 
 Then just call `redcedar.connect()` with no arguments.
 
-If both are provided, explicit arguments take priority over environment variables. If neither is set, the client defaults to `http://localhost:8000` with no API key.
+If both are provided, explicit arguments take priority over environment variables. If neither is set, the client defaults to `http://localhost:8002` (the port `run_server` uses) with no API key.
+
+**Hosted server.** Use the URL and API key you were given, for example `redcedar.connect(url="https://<hosted-server-url>", api_key="your-api-key")`. A hosted server accepts only requests with a valid API key. See your Cascade representative for information about how to access the Red Cedar engine as a service.
+
+**Local mode (development).** With the Red Cedar source, `redcedar.connect(local="path/to/red-cedar")` starts the server inside your own Python process, on a free local port, and connects to it. Everything works as with a separate server, and a debugger stops at breakpoints in the Red Cedar code. It needs the Red Cedar dependencies in your environment; the folder can also come from the `REDCEDAR_CORE_PATH` environment variable (`connect(local=True)`). Don't run it next to another server started from the same folder: they share its job database.
 
 ---
 
@@ -52,7 +56,7 @@ The `id` is what you pass to analysis and training functions (e.g., `"wdbc"`, `"
 
 ### `client.datasets.upload(file_path)`
 
-Uploads a CSV file and returns a dataset ID to pass to `training.run()`. The last column is the class label; a header row is optional.
+Uploads a CSV file and returns a dataset ID to pass to `training.run()` or `inference.run()`. The last column is the class label; a header row is optional. You can also pass the file path to those calls directly, which uploads it each time; upload once when you use the same file several times.
 
 ```python
 dataset_id = client.datasets.upload("my_data.csv")
@@ -122,7 +126,7 @@ Train a quantum ML model on a dataset.
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
-| `dataset_id` | str | required | Dataset ID from the catalog, an ID from `datasets.upload()`, or an OpenML dataset name |
+| `dataset_id` | str | required | A CSV file path (uploaded first), a dataset ID from the catalog, an ID from `datasets.upload()`, or an OpenML dataset name |
 | `settings` | dict, str, or None | `None` | Override default training parameters (see below) |
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
@@ -157,7 +161,32 @@ for layer, v in result['validation'].items():
     print(f"Layer {layer}: test accuracy {v['test_accuracy']:.1%}")
 ```
 
-The `train_id` is used for inference and explainable AI calls.
+The `train_id` is used for evaluation, inference and explainable AI calls.
+
+### `client.training.evaluate(train_id, layer=None, verbose=False, on_progress=None, settings=None)`
+
+Scores a trained model on the test rows held back from its training run (by default 20% of the rows) and gives accuracy results. You pass no data: the server rebuilds the same split from the model's saved settings. For a prediction for each row of new data, use `inference.run()`.
+
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `train_id` | str | required | Training job ID from `training.run()` |
+| `layer` | int | highest layer | Which layer of the trained model to test |
+| `verbose` | bool | `False` | Print progress to stdout |
+| `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
+| `settings` | dict | `None` | Run-time overrides; only `backend` and `parallelize` are used, e.g. to test on a different backend |
+
+```python
+report = client.training.evaluate(train_id, verbose=True)
+
+print(report['overall_accuracy'])    # 0.754
+print(report['overall_loss'])        # 0.2822
+print(report['test_samples'])        # 114
+
+for cls in report['per_class']:
+    print(f"Class {cls['class']}: {cls['accuracy']:.1%} ({cls['samples']} samples)")
+```
+
+Returns a dict with: `train_id`, `layer`, `overall_accuracy`, `overall_loss`, `test_samples`, `num_classes`, `per_class` (list of dicts with `class`, `accuracy`, `loss`, `samples`), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`. At most 400 test rows are scored.
 
 ### `client.training.analyze(train_id, layer=None, verbose=False, on_progress=None)`
 
@@ -222,34 +251,39 @@ Commonly used settings keys:
 
 ## Inference
 
-### `client.inference.run(train_id, layer=None, verbose=False, on_progress=None, settings=None)`
+### `client.inference.run(train_id, data, layer=None, output=None, verbose=False, on_progress=None, settings=None)`
 
-Run the trained model on held-out test data and get accuracy results.
+Runs a trained model on new rows and returns a prediction for each row.
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `train_id` | str | required | Training job ID from `training.run()` |
-| `layer` | int | highest layer | Which layer of the trained model to test |
+| `data` | str | required | A CSV file path (uploaded first), or an ID from `datasets.upload()` |
+| `layer` | int | highest layer | Which layer of the trained model to use |
+| `output` | str | `None` | Also write the input rows plus the predictions to this CSV file (needs `data` as a file path) |
 | `verbose` | bool | `False` | Print progress to stdout |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
-| `settings` | dict | `None` | Run-time overrides; only `backend` and `parallelize` are used, e.g. to test on a different backend |
+| `settings` | dict | `None` | Run-time overrides; only `backend` and `parallelize` are used |
 
 ```python
-inference = client.inference.run(train_id, verbose=True)
+predictions = client.inference.run(train_id, "new_data.csv", output="predictions.csv")
 
-print(inference['overall_accuracy'])    # 0.754
-print(inference['overall_loss'])        # 0.2822
-print(inference['test_samples'])        # 114
-
-for cls in inference['per_class']:
-    print(f"Class {cls['class']}: {cls['accuracy']:.1%} ({cls['samples']} samples)")
+for row in predictions['predictions'][:5]:
+    print(row['prediction'], row['probabilities'])   # B {'B': 0.94, 'M': 0.06}
 ```
 
-Returns a dict with: `train_id`, `layer`, `overall_accuracy`, `overall_loss`, `test_samples`, `num_classes`, `per_class` (list of dicts with `class`, `accuracy`, `loss`, `samples`), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`.
+Returns a dict with: `train_id`, `layer`, `task` (`"classification"`), `rows`, `predictions` (one dict per row, in file order, with `prediction` and `probabilities`, class label to probability), `data_loading_seconds`, `inference_seconds`, `elapsed_seconds`, and `accuracy` when the rows include the target column. The `output` file has the input columns plus `prediction` and one `probability_<class>` column per class.
+
+The new file's columns are matched to the model's inputs:
+
+- **By name** when the new file and the training file both have a header row. Columns can be in any order, and columns the model doesn't use (an ID, say) are ignored. A missing feature column stops with an error naming it.
+- **By position** otherwise: the training features in training order, optionally followed by the target column. Any other number of columns stops with an error.
+
+A header row is a first row that is all text. The training data must still be on the server: the preprocessing is rebuilt from it.
 
 ### `client.inference.models()`
 
-List the six most recently trained models on the server. Older models stay on the server and can still be used by `train_id`.
+List the six most recently trained models on the server. Older models can still be used by `train_id` until the server deletes them (see Current Limitations).
 
 ```python
 models = client.inference.models()
@@ -349,14 +383,30 @@ result = client.training.run("wdbc", verbose=True, settings={
 train_id = result['train_id']
 
 # Evaluate
-inference = client.inference.run(train_id, verbose=True)
-print(f"Accuracy: {inference['overall_accuracy']:.1%}")
+report = client.training.evaluate(train_id, verbose=True)
+print(f"Accuracy: {report['overall_accuracy']:.1%}")
+
+# Predict
+predictions = client.inference.run(train_id, "new_data.csv", output="predictions.csv")
 
 # Explain
 explanation = client.explainable.run(train_id, verbose=True)
 for q in explanation['qubit_map']:
     print(f"  {q['feature_name']}: {q['importance']*100:.1f}%")
 ```
+
+## Command Line
+
+Installing the client also installs the `redcedar` command (`python -m redcedar` does the same, for when pip's scripts folder isn't on the PATH). It uses `REDCEDAR_URL` and `REDCEDAR_API_KEY`, or `--url` and `--api-key`.
+
+```bash
+redcedar train my_data.csv --qubits 6 --layers 2 --seed 123    # prints the train_id
+redcedar evaluate <train_id>
+redcedar predict <train_id> new_data.csv -o predictions.csv
+redcedar models
+```
+
+`train` also takes `--settings my_settings.toml` (any setting) and `--backend`; `evaluate` and `predict` take `--layer` and `--backend`. Run `redcedar <command> --help` for the details.
 
 ## Example Notebooks
 
@@ -380,6 +430,10 @@ The [redcedar-examples](https://github.com/coherent-computing/redcedar-examples)
 - **CSV uploads only.** You can train on catalog datasets and on CSV files you upload, but you can't yet plug in your own data loaders.
 
 - **Only training can be stopped.** Inference, explainable AI and the training replay can't be stopped once they start.
+
+- **Trained models are not kept forever.** When it starts, the server deletes trained models older than 24 hours, and all but the 30 most recent.
+
+- **The test split is always used.** `test_size=0` (training on all rows) is not supported yet.
 
 ## Planned Enhancements
 
