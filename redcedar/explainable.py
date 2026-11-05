@@ -23,6 +23,9 @@ class ExplainableManager:
             Dict with qubit_map (feature importance per qubit),
             distributions, convergence values, feature_indices, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.explain, train_id, settings=settings,
+                                           verbose=verbose, on_progress=on_progress)
         body = {"train_id": train_id, "user_id": "sdk"}
         if settings:
             body["settings"] = settings

@@ -91,17 +91,27 @@ old one, which then stops working.
 
 ### Local Mode, for Development
 
-With the Red Cedar source and its dependencies in your Python environment, the SDK can run the server inside
-your own process:
+With the Red Cedar source and its dependencies in your Python environment, the SDK can call the Red Cedar code
+directly, with no server. Install the source once, from the `red-cedar` folder:
 
-```python
-client = redcedar.connect(local="path/to/red-cedar")
+```bash
+pip install -e .
 ```
 
-This starts the server in a background thread, on a free local port, and connects to it. Every call works
-exactly as with a separate server, and a debugger attached to your process stops at breakpoints in the Red Cedar
-code. `connect(local=True)` takes the folder from the `REDCEDAR_CORE_PATH` environment variable. Don't use it
-while another server started from the same folder is running: the two share its job database.
+Then connect in local mode:
+
+```python
+client = redcedar.connect(local=True)
+```
+
+Every SDK call then runs the same function the server runs for it, in your own Python process and thread: no
+server, no port, no HTTP. Results are the same as through a server, and a debugger steps from the SDK call
+straight into the Red Cedar code. Without the install, pass the folder instead (`connect(local="path/to/red-cedar")`,
+or set `REDCEDAR_CORE_PATH`).
+
+Local mode uses the datasets, trained models and job records of that `red-cedar` folder, the same ones a server
+started from it uses: a model trained through the server can be evaluated locally, and the other way round.
+Ctrl+C stops a local training run, as `training.stop()` does; the layers that finished are kept.
 
 ## Data
 
@@ -556,7 +566,7 @@ redcedar status
 | `redcedar status` | `status()`; prints the server's URL and version and the SDK version | |
 
 Any setting can come from a file: `--settings my_settings.toml`. Before the command, `--url` and `--api-key`
-choose the server, `--local path/to/red-cedar` uses [local mode](#local-mode-for-development), and `-q` turns
+choose the server, `--local` uses [local mode](#local-mode-for-development), and `-q` turns
 off the progress output. Run `redcedar <command> --help` for the details.
 
 If the `redcedar` command isn't found (pip's scripts folder isn't on your PATH, which is common on Windows and

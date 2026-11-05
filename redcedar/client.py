@@ -29,8 +29,8 @@ def connect(url=None, api_key=None, local=False):
         RedCedarClient instance.
     """
     if local:
-        from .local import LocalCore
-        return RedCedarClient(None, None, local=LocalCore(None if local is True else local))
+        from .local import import_core
+        return RedCedarClient(None, None, core=import_core(None if local is True else local))
     url = url or os.environ.get("REDCEDAR_URL", "http://127.0.0.1:8002")
     api_key = api_key or os.environ.get("REDCEDAR_API_KEY", "")
     return RedCedarClient(url, api_key)
@@ -55,10 +55,12 @@ def _raise_for_status(resp):
 class RedCedarClient:
     """Main client for interacting with the Red Cedar server."""
 
-    def __init__(self, url, api_key, local=None):
+    def __init__(self, url, api_key, core=None):
         self.url = url.rstrip("/") if url else None
         self.api_key = api_key
-        self._local = local   # LocalCore in local mode (connect(local=True))
+        # Local mode (connect(local=True)): the redcedar_core module. Each SDK call then
+        # calls its core function directly instead of sending a request to a server.
+        self.core = core
         self._last_job_id = None
         self._server_version = None
         self.datasets = DatasetManager(self)
@@ -68,9 +70,9 @@ class RedCedarClient:
         self.explainable = ExplainableManager(self)
 
     def _server(self, path=""):
-        """The server URL. Local mode has no server: every request has a direct function."""
+        """The server URL. Local mode has no server: every SDK call has a direct one."""
         if self.url is None:
-            raise NotImplementedError(f"Local mode has no direct function for {path}")
+            raise NotImplementedError(f"Local mode has no direct call for {path}")
         return self.url
 
     def _headers(self):
@@ -79,33 +81,30 @@ class RedCedarClient:
             h["x-api-key"] = self.api_key
         return h
 
-    def _direct(self, method, path):
-        """In local mode, the direct function for this request, if there is one."""
-        return self._local.call(method, path) if self._local else None
-
-    def _local_call(self, fn, *args):
-        """Run a local-mode direct function. Something not found, or a bad request,
-        raises requests.HTTPError with the server's message, as in server mode."""
-        from .local import NotFound
+    def _local_call(self, fn, *args, **kwargs):
+        """Call a redcedar_core function (local mode). Something not found, or a bad
+        request, raises requests.HTTPError with the server's message, as in server mode."""
         try:
-            return fn(*args)
-        except (FileNotFoundError, NotFound) as e:
+            return fn(*args, **kwargs)
+        except FileNotFoundError as e:
             raise requests.HTTPError(f"404 Not Found: {e}") from e
         except ValueError as e:
             raise requests.HTTPError(f"400 Bad Request: {e}") from e
 
+    def _run_local(self, fn, *args, verbose=False, on_progress=None, events=None, **kwargs):
+        """Run a redcedar_core job function in this thread (local mode). Its events go
+        to the same handler as a server job's: progress, log lines (verbose), and the
+        other events into the events list. Returns the job's result."""
+        out = sys.stdout   # while the job runs, print() goes to its log
+        on_event = lambda e: self._handle_event(e, verbose, on_progress, events, out=out)  # noqa: E731
+        return self._local_call(fn, *args, on_event=on_event, **kwargs)
+
     def _get(self, path):
-        op = self._direct("GET", path)
-        if op:
-            return self._local_call(op)
         resp = requests.get(f"{self._server(path)}{path}", headers=self._headers())
         _raise_for_status(resp)
         return resp.json()
 
     def _post(self, path, body=None):
-        op = self._direct("POST", path)
-        if op:
-            return self._local_call(op)
         resp = requests.post(
             f"{self._server(path)}{path}",
             headers=self._headers(),
@@ -116,9 +115,6 @@ class RedCedarClient:
 
     def _post_file(self, path, file_path):
         """Upload a file as multipart form data (field name 'file')."""
-        op = self._local.file(path) if self._local else None
-        if op:
-            return self._local_call(op, file_path)
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         with open(file_path, "rb") as f:
             resp = requests.post(
@@ -183,20 +179,7 @@ class RedCedarClient:
         """Start a job via POST, consume SSE until done. Returns summary.
 
         If events is a list, every other event the job sends (e.g. training
-        datapoints and validation results) is appended to it.
-
-        In local mode a job with a direct function runs in this thread instead,
-        and its events come to the same handler as they are sent."""
-        if self._local:
-            direct = self._local.job(post_path)
-            if direct:
-                self._last_job_id, op = direct
-                # While the job runs, print() goes to its log, so progress and log
-                # lines are printed to the console stream found here.
-                out = sys.stdout
-                return self._local_call(op, body or {}, lambda e: self._handle_event(
-                    e, verbose, on_progress, events, out=out))
-
+        datapoints and validation results) is appended to it."""
         result = self._post(post_path, body)
         job_id = result.get("job_id") or result.get("train_id")
         self._last_job_id = job_id
@@ -267,8 +250,8 @@ class RedCedarClient:
             mode, server_version is the version of the Red Cedar code in use.
         """
         from . import __version__
-        if self._local:
-            return {"ok": True, "server_version": self._local.core.version(), "sdk_version": __version__}
+        if self.core:
+            return {"ok": True, "server_version": self.core.version(), "sdk_version": __version__}
         try:
             resp = requests.get(f"{self._server('/health')}/health", headers=self._headers(), timeout=5)
         except requests.ConnectionError:

@@ -18,6 +18,9 @@ class AnalysisManager:
         Returns:
             Dict with variance_ratios, cumulative_variance, thresholds, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.pca, dataset_id,
+                                           verbose=verbose, on_progress=on_progress)
         return self._client._run_job(
             "/analysis/pca",
             "/analysis/pca/{job_id}/stream",
@@ -37,6 +40,9 @@ class AnalysisManager:
         Returns:
             Dict with ranked_features, cumulative_mi, thresholds, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.mi, dataset_id,
+                                           verbose=verbose, on_progress=on_progress)
         return self._client._run_job(
             "/analysis/mi",
             "/analysis/mi/{job_id}/stream",
@@ -56,6 +62,9 @@ class AnalysisManager:
         Returns:
             Dict with estimatedQubits, standardDeviation, plotData, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.qre, dataset_id,
+                                           verbose=verbose, on_progress=on_progress)
         return self._client._run_job(
             "/analysis/qre",
             "/analysis/qre/{job_id}/stream",

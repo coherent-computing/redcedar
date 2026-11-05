@@ -1,6 +1,9 @@
 """Training — start, monitor, and get results."""
 
 import re
+import uuid
+
+import requests
 
 from .settings import load_settings
 
@@ -54,14 +57,21 @@ class TrainingManager:
             params["task"] = task
 
         events = []
-        result = self._client._run_job(
-            "/train",
-            "/train/{job_id}/stream",
-            body={"parameters": params, "user_id": "sdk"},
-            verbose=verbose,
-            on_progress=on_progress,
-            events=events,
-        )
+        if self._client.core:   # local mode: call the core directly
+            # The train_id is chosen here, so it is known while training runs (for stop())
+            train_id = str(uuid.uuid4())
+            self._client._last_job_id = train_id
+            result = self._client._run_local(self._client.core.train, params, train_id=train_id,
+                                             verbose=verbose, on_progress=on_progress, events=events)
+        else:
+            result = self._client._run_job(
+                "/train",
+                "/train/{job_id}/stream",
+                body={"parameters": params, "user_id": "sdk"},
+                verbose=verbose,
+                on_progress=on_progress,
+                events=events,
+            )
 
         # The SSE summary doesn't include train_id, but callers need it
         # for inference and explainable calls. Add it from the POST response
@@ -100,6 +110,9 @@ class TrainingManager:
         Returns:
             Dict with overall_accuracy, overall_loss, per_class results, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.evaluate, train_id, layer=layer,
+                                           settings=settings, verbose=verbose, on_progress=on_progress)
         body = {"train_id": train_id, "user_id": "sdk"}
         if layer is not None:
             body["layer"] = layer
@@ -127,6 +140,9 @@ class TrainingManager:
             Dict with accuracy_history, loss_history, num_checkpoints,
             final_accuracy, final_loss, etc.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._run_local(self._client.core.replay, train_id, layer=layer,
+                                           verbose=verbose, on_progress=on_progress)
         body = {"train_id": train_id, "user_id": "sdk"}
         if layer is not None:
             body["layer"] = layer
@@ -144,6 +160,11 @@ class TrainingManager:
         Returns:
             Dict with train_id, status, progress, summary, error_message.
         """
+        if self._client.core:   # local mode: call the core directly
+            status = self._client.core.training.status(train_id)
+            if status is None:
+                raise requests.HTTPError("404 Not Found: Training job not found")   # as the server
+            return status
         return self._client._get(f"/train/{train_id}/status")
 
     def stop(self, train_id):
@@ -151,6 +172,10 @@ class TrainingManager:
         are kept. Call it from another thread or process, since training.run()
         blocks until the job ends; that call then raises RuntimeError.
         """
+        if self._client.core:   # local mode: the job runs in this process
+            if not self._client.core.training.stop(train_id):
+                raise requests.HTTPError("404 Not Found: Training job not found")   # as the server
+            return {"status": "stopping", "message": f"Stop requested for {train_id}."}
         return self._client._post(f"/train/{train_id}/stop")
 
     def _dataset_selection(self, dataset_id):

@@ -15,6 +15,8 @@ class DatasetManager:
         Returns:
             List of dataset dicts with id, name, description, rows, columns, classes.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client.core.datasets()
         return self._client._get("/datasets")
 
     def upload(self, file_path):
@@ -28,6 +30,8 @@ class DatasetManager:
         Returns:
             The dataset ID to pass to training.run().
         """
+        if self._client.core:
+            return self._client._local_call(self._client.core.upload, file_path)
         return self._client._post_file("/upload", file_path)["jobId"]
 
     def _as_id(self, data):

@@ -36,19 +36,24 @@ class InferenceManager:
             when the target column is present.
         """
         data_path = os.fspath(data) if output and isinstance(data, (str, os.PathLike)) else None
-        body = {"train_id": train_id, "user_id": "sdk",
-                "data_id": self._client.datasets._as_id(data)}
-        if layer is not None:
-            body["layer"] = layer
-        if settings:
-            body["settings"] = settings
-        result = self._client._run_job(
-            "/inference",
-            "/inference/{job_id}/stream",
-            body=body,
-            verbose=verbose,
-            on_progress=on_progress,
-        )
+        data_id = self._client.datasets._as_id(data)
+        if self._client.core:   # local mode: call the core directly
+            result = self._client._run_local(self._client.core.predict, train_id, data_id,
+                                             layer=layer, settings=settings,
+                                             verbose=verbose, on_progress=on_progress)
+        else:
+            body = {"train_id": train_id, "user_id": "sdk", "data_id": data_id}
+            if layer is not None:
+                body["layer"] = layer
+            if settings:
+                body["settings"] = settings
+            result = self._client._run_job(
+                "/inference",
+                "/inference/{job_id}/stream",
+                body=body,
+                verbose=verbose,
+                on_progress=on_progress,
+            )
         if output:
             if not data_path:
                 raise ValueError("output= needs data given as a CSV file path")
@@ -61,6 +66,8 @@ class InferenceManager:
         Returns:
             Dict with 'models' list containing model metadata.
         """
+        if self._client.core:   # local mode: call the core directly
+            return self._client.core.models()
         return self._client._get("/inference/models")
 
 
