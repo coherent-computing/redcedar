@@ -17,7 +17,7 @@ def connect(url=None, api_key=None, local=False):
     """Create a RedCedarClient connected to the server.
 
     Args:
-        url: Server URL. Defaults to REDCEDAR_URL env var or http://localhost:8002
+        url: Server URL. Defaults to REDCEDAR_URL env var or http://127.0.0.1:8002
              (the port run_server uses).
         api_key: API key. Defaults to REDCEDAR_API_KEY env var.
         local: For development with the Red Cedar source. True calls the Red Cedar
@@ -31,7 +31,7 @@ def connect(url=None, api_key=None, local=False):
     if local:
         from .local import LocalCore
         return RedCedarClient(None, None, local=LocalCore(None if local is True else local))
-    url = url or os.environ.get("REDCEDAR_URL", "http://localhost:8002")
+    url = url or os.environ.get("REDCEDAR_URL", "http://127.0.0.1:8002")
     api_key = api_key or os.environ.get("REDCEDAR_API_KEY", "")
     return RedCedarClient(url, api_key)
 
@@ -83,10 +83,21 @@ class RedCedarClient:
         """In local mode, the direct function for this request, if there is one."""
         return self._local.call(method, path) if self._local else None
 
+    def _local_call(self, fn, *args):
+        """Run a local-mode direct function. Something not found, or a bad request,
+        raises requests.HTTPError with the server's message, as in server mode."""
+        from .local import NotFound
+        try:
+            return fn(*args)
+        except (FileNotFoundError, NotFound) as e:
+            raise requests.HTTPError(f"404 Not Found: {e}") from e
+        except ValueError as e:
+            raise requests.HTTPError(f"400 Bad Request: {e}") from e
+
     def _get(self, path):
         op = self._direct("GET", path)
         if op:
-            return op()
+            return self._local_call(op)
         resp = requests.get(f"{self._server(path)}{path}", headers=self._headers())
         _raise_for_status(resp)
         return resp.json()
@@ -94,7 +105,7 @@ class RedCedarClient:
     def _post(self, path, body=None):
         op = self._direct("POST", path)
         if op:
-            return op()
+            return self._local_call(op)
         resp = requests.post(
             f"{self._server(path)}{path}",
             headers=self._headers(),
@@ -107,7 +118,7 @@ class RedCedarClient:
         """Upload a file as multipart form data (field name 'file')."""
         op = self._local.file(path) if self._local else None
         if op:
-            return op(file_path)
+            return self._local_call(op, file_path)
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         with open(file_path, "rb") as f:
             resp = requests.post(
@@ -180,12 +191,11 @@ class RedCedarClient:
             direct = self._local.job(post_path)
             if direct:
                 self._last_job_id, op = direct
-                # While the job runs, print() goes to its log (and the console), so
-                # progress is printed to the console stream found here. Its log lines
-                # are already on the console, so they aren't printed again.
+                # While the job runs, print() goes to its log, so progress and log
+                # lines are printed to the console stream found here.
                 out = sys.stdout
-                return op(body or {}, lambda e: self._handle_event(
-                    e, verbose, on_progress, events, out=out, logs=False))
+                return self._local_call(op, body or {}, lambda e: self._handle_event(
+                    e, verbose, on_progress, events, out=out))
 
         result = self._post(post_path, body)
         job_id = result.get("job_id") or result.get("train_id")
@@ -213,7 +223,7 @@ class RedCedarClient:
 
         raise RuntimeError("SSE stream ended without done/error event")
 
-    def _handle_event(self, event, verbose, on_progress, events, out=None, logs=True):
+    def _handle_event(self, event, verbose, on_progress, events, out=None):
         """Report one job event: progress and messages (verbose), the on_progress
         callback, and the other events into the events list."""
         etype = event.get("_event", event.get("type", ""))
@@ -231,7 +241,7 @@ class RedCedarClient:
                 print(f"\r  [100%] Done.{'':40}", file=out)
 
         elif etype == "log":
-            if verbose and logs:
+            if verbose:
                 msg = event.get("message", "")
                 if msg:
                     print(f"  {msg}", file=out)

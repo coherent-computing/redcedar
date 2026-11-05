@@ -30,7 +30,7 @@ the plots in the examples.
 run_server.bat           # Windows
 ```
 
-It listens on `http://localhost:8002`, which is where the SDK looks by default:
+It listens on port 8002, and the SDK looks for it at `http://127.0.0.1:8002` by default:
 
 ```python
 import redcedar

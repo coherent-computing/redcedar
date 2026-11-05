@@ -49,8 +49,8 @@ pip install -e .
 ### A Server on Your Own Machine
 
 If you have the Red Cedar engine installed, start its server from the `red-cedar` folder with `./run_server.sh`
-(Linux, Mac) or `run_server.bat` (Windows). It listens on `http://localhost:8002`, which is where the SDK
-connects by default:
+(Linux, Mac) or `run_server.bat` (Windows). It listens on port 8002, and the SDK connects to
+`http://127.0.0.1:8002` by default:
 
 ```python
 import redcedar
@@ -60,7 +60,11 @@ print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version':
 ```
 
 `status()` also tells you which versions you are using: the server's version (`client.server_version` gives it
-on its own) and the SDK's. They are numbered separately: one SDK version works with many server versions.
+on its own) and the SDK's. The SDK's version follows the server's (SDK 0.93.x goes with server 0.93).
+
+In `REDCEDAR_URL`, use `127.0.0.1` rather than `localhost` for a server on your own machine. On Windows,
+`localhost` is tried first as IPv6 (`::1`), which the server doesn't listen on, and every request then waits
+about 2 seconds.
 
 ### A Hosted Server
 

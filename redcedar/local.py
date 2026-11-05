@@ -35,22 +35,26 @@ _JOBS = {
 }
 
 
-def _found(result, what):
+class NotFound(Exception):
+    """A request for something that doesn't exist (the server answers 404)."""
+
+
+def _found(result):
     if result is None:
-        raise LookupError(f"{what} not found")
+        raise NotFound("Training job not found")   # the server's message
     return result
 
 
 def _stopped(stopping, train_id):
     if not stopping:
-        raise LookupError(f"Training job {train_id} is not running in this process")
+        raise NotFound("Training job not found")   # not running in this process
     return {"status": "stopping", "message": f"Stop requested for {train_id}."}
 
 
 # Other requests: (path pattern, call); the pattern's groups are passed to the call
 _GETS = [
     (r"/datasets", lambda core: core.datasets()),
-    (r"/train/([^/]+)/status", lambda core, i: _found(core.training.status(i), f"Training job {i}")),
+    (r"/train/([^/]+)/status", lambda core, i: _found(core.training.status(i))),
     (r"/inference/models", lambda core: core.models()),
 ]
 _POSTS = [

@@ -19,7 +19,7 @@ from .client import connect
 
 def main(argv=None):
     p = argparse.ArgumentParser(prog="redcedar", description="Red Cedar quantum machine learning")
-    p.add_argument("--url", help="server URL (default: REDCEDAR_URL or http://localhost:8002)")
+    p.add_argument("--url", help="server URL (default: REDCEDAR_URL or http://127.0.0.1:8002)")
     p.add_argument("--api-key", help="API key (default: REDCEDAR_API_KEY)")
     p.add_argument("--local", action="store_true",
                    help="call the Red Cedar core directly in this process instead of a server "
