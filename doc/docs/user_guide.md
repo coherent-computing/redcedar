@@ -50,14 +50,20 @@ pip install -e .
 
 If you have the Red Cedar engine installed, start its server from the `red-cedar` folder with `./run_server.sh`
 (Linux, Mac) or `run_server.bat` (Windows). It listens on port 8002, and the SDK connects to
-`http://127.0.0.1:8002` by default:
+`http://127.0.0.1:8002` by default. The server only accepts requests with the key that the script sets (the line
+`export BACKEND_API_KEY=...` in `run_server.sh`, `set BACKEND_API_KEY=...` in `run_server.bat`). Pass the same
+key to `connect()`, or set it once as `REDCEDAR_API_KEY`:
 
 ```python
 import redcedar
 
-client = redcedar.connect()
+client = redcedar.connect(api_key="<the BACKEND_API_KEY value from run_server.sh>")
 print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.93.0'}
 ```
+
+Without the key, `status()` and `datasets.list()` still work, but training, analysis, inference and explainable
+AI are refused (`422`, no key; `403`, a wrong key). This key belongs to the server itself. A hosted server uses
+your personal API key instead (next section).
 
 `status()` also tells you which versions you are using: the server's version (`client.server_version` gives it
 on its own) and the SDK's. The SDK's version follows the server's (SDK 0.93.x goes with server 0.93).

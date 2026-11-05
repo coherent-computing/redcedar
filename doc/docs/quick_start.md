@@ -30,14 +30,19 @@ the plots in the examples.
 run_server.bat           # Windows
 ```
 
-It listens on port 8002, and the SDK looks for it at `http://127.0.0.1:8002` by default:
+It listens on port 8002, and the SDK looks for it at `http://127.0.0.1:8002` by default. The server only accepts
+requests with the key that `run_server.sh` sets (the line `export BACKEND_API_KEY=...`), so give the SDK the same
+key, or set it once in your shell as `REDCEDAR_API_KEY`:
 
 ```python
 import redcedar
 
-client = redcedar.connect()
+client = redcedar.connect(api_key="<the BACKEND_API_KEY value from run_server.sh>")
 print(client.status())          # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.93.0'}
 ```
+
+Without the key, `status()` and the dataset list still work, but training, analysis and the other calls are
+refused.
 
 **A hosted server.** Pass its URL and your API key, or set them once in your shell as `REDCEDAR_URL` and
 `REDCEDAR_API_KEY`:
