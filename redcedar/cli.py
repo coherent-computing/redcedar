@@ -21,8 +21,10 @@ def main(argv=None):
     p = argparse.ArgumentParser(prog="redcedar", description="Red Cedar quantum machine learning")
     p.add_argument("--url", help="server URL (default: REDCEDAR_URL or http://localhost:8002)")
     p.add_argument("--api-key", help="API key (default: REDCEDAR_API_KEY)")
-    p.add_argument("--local", metavar="PATH",
-                   help="run the server inside this process, from this red-cedar folder")
+    p.add_argument("--local", action="store_true",
+                   help="call the Red Cedar core directly in this process instead of a server "
+                        "(redcedar_core, installed with pip install -e, or the red-cedar folder "
+                        "in REDCEDAR_CORE_PATH)")
     p.add_argument("-q", "--quiet", action="store_true", help="no progress output")
     sub = p.add_subparsers(dest="command", required=True)
 
@@ -116,7 +118,7 @@ def main(argv=None):
 
         elif args.command == "status":
             s = client.status()
-            print(f"Server: {client.url}")
+            print(f"Server: {client.url or 'none (local mode: the Red Cedar core in this process)'}")
             print(f"Server version: {s['server_version'] or 'unknown'}")
             print(f"SDK version: {s['sdk_version']}")
             if not s["ok"]:
