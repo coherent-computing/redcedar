@@ -32,7 +32,7 @@ Then just call `redcedar.connect()` with no arguments.
 
 If both are provided, explicit arguments take priority over environment variables. If neither is set, the client defaults to `http://localhost:8002` (the port `run_server` uses) with no API key.
 
-**Hosted server.** Use the URL and API key you were given, for example `redcedar.connect(url="https://<hosted-server-url>", api_key="your-api-key")`. A hosted server accepts only requests with a valid API key. With an account that has QML access, sign in to the server's web page, open **API Keys** and click **Generate my key** (one key at a time; a new key replaces the old one). Otherwise, see your Cascade representative for information about how to access the Red Cedar engine as a service.
+**Hosted server.** Use the URL and API key you were given, for example `redcedar.connect(url="https://<hosted-server-url>", api_key="your-api-key")`. A hosted server accepts only requests with a valid API key. Contact your Cascade Quantum representative to get one, or to get access to the Red Cedar user interface. If you already have access to the user interface, you can create your own key there, under **API Keys** (one key at a time; a new key replaces the old one).
 
 **Local mode (development).** With the Red Cedar source, `redcedar.connect(local="path/to/red-cedar")` starts the server inside your own Python process, on a free local port, and connects to it. Everything works as with a separate server, and a debugger stops at breakpoints in the Red Cedar code. It needs the Red Cedar dependencies in your environment; the folder can also come from the `REDCEDAR_CORE_PATH` environment variable (`connect(local=True)`). Don't run it next to another server started from the same folder: they share its job database.
 
