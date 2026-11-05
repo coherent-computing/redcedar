@@ -1,0 +1,40 @@
+/* Red Cedar custom theme overrides */
+
+/* Navbar — override gradient and color */
+.navbar.bg-primary {
+    background-image: none !important;
+    background-color: #277C9D !important;
+}
+
+/* Active nav item — stronger highlight */
+.navbar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Hide Previous/Next nav links in top bar */
+.navbar-nav .nav-link[rel="prev"],
+.navbar-nav .nav-link[rel="next"] {
+    display: none !important;
+}
+
+/* Section headings — slightly bolder */
+h1 {
+    color: #001745;
+    font-weight: 600;
+}
+h2 {
+    color: #001745;
+    font-weight: 600;
+    border-bottom: 1px solid #d4e5eb;
+    padding-bottom: 0.3em;
+}
+h3 {
+    color: #1b5f7a;
+    font-weight: 600;
+}
+h4, h5, h6 {
+    color: #277C9D;
+    font-weight: 500;
+}

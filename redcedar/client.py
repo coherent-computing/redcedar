@@ -36,6 +36,22 @@ def connect(url=None, api_key=None, local=False):
     return RedCedarClient(url, api_key)
 
 
+def _raise_for_status(resp):
+    """Like resp.raise_for_status(), but the message includes the server's reason
+    ('detail' from the Red Cedar server, 'error' from the gateway)."""
+    if resp.ok:
+        return
+    try:
+        body = resp.json()
+        reason = body.get("detail") or body.get("error") if isinstance(body, dict) else None
+    except ValueError:
+        reason = None
+    msg = f"{resp.status_code} {resp.reason}"
+    if reason:
+        msg += f": {reason}"
+    raise requests.HTTPError(msg, response=resp)
+
+
 class RedCedarClient:
     """Main client for interacting with the Red Cedar server."""
 
@@ -57,7 +73,7 @@ class RedCedarClient:
 
     def _get(self, path):
         resp = requests.get(f"{self.url}{path}", headers=self._headers())
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     def _post(self, path, body=None):
@@ -66,7 +82,7 @@ class RedCedarClient:
             headers=self._headers(),
             json=body or {},
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     def _post_file(self, path, file_path):
@@ -78,7 +94,7 @@ class RedCedarClient:
                 headers=headers,
                 files={"file": (os.path.basename(file_path), f)},
             )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     def _open_stream(self, path, verbose=False):
@@ -91,7 +107,7 @@ class RedCedarClient:
                 stream=True,
             )
             if resp.status_code != 404:
-                resp.raise_for_status()
+                _raise_for_status(resp)
                 return resp
             resp.close()
 
@@ -99,7 +115,7 @@ class RedCedarClient:
             qs = self._get("/jobs/status")
             if not qs.get("total"):
                 # Nothing queued or running, so the job is gone
-                resp.raise_for_status()
+                _raise_for_status(resp)
             if verbose:
                 print("\r  Waiting in queue...", end="", flush=True)
             time.sleep(2)

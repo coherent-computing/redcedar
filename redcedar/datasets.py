@@ -35,4 +35,7 @@ class DatasetManager:
         else (a catalog ID or an upload ID) is returned as it is."""
         if isinstance(data, os.PathLike) or (isinstance(data, str) and os.path.isfile(data)):
             return self.upload(os.fspath(data))
+        # IDs never end in .csv, so this is a file path that doesn't exist
+        if isinstance(data, str) and data.lower().endswith(".csv"):
+            raise FileNotFoundError(f"No such file: {data}")
         return data

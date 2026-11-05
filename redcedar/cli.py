@@ -112,7 +112,7 @@ def main(argv=None):
                 print(m["train_id"], m.get("dataset_display_name") or m.get("dataset", ""),
                       m.get("task", ""), f"{m.get('num_qubits')} qubits", f"layers {m.get('layers')}")
 
-    except (RuntimeError, requests.HTTPError, requests.ConnectionError) as err:
+    except (RuntimeError, requests.HTTPError, requests.ConnectionError, FileNotFoundError) as err:
         print(f"Error: {err}", file=sys.stderr)
         return 1
     return 0

@@ -2,6 +2,8 @@
 
 Python client for the Red Cedar quantum machine learning server. Run dataset analysis, model training, inference, and explainable AI from notebooks or scripts — no quantum computing libraries required on your machine.
 
+Documentation: [coherent-computing.github.io/redcedar](https://coherent-computing.github.io/redcedar/) (source in [`doc/`](doc/)).
+
 ## Install
 
 From a clone of this repository:

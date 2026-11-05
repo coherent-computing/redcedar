@@ -1,0 +1,17 @@
+site_name: Red Cedar
+site_url: https://coherent-computing.github.io/redcedar/
+repo_url: https://github.com/coherent-computing/redcedar
+
+theme: mkdocs
+
+extra_css:
+    - css/custom.css
+
+nav:
+    - Home: index.md
+    - Quick Start: quick_start.md
+    - User Guide: user_guide.md
+    - Examples: examples.md
+    - Releases: release_notes.md
+    - PAL: known_issues.md
+    - About: about.md

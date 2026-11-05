@@ -1,0 +1,27 @@
+# Build the documentation in doc/ with mkdocs and publish it to the gh-pages branch,
+# which GitHub Pages serves at https://coherent-computing.github.io/redcedar/
+name: Deploy documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'doc/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install mkdocs
+      - run: |
+          cd doc
+          mkdocs gh-deploy --force
