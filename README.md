@@ -16,7 +16,7 @@ The only dependency is `requests`. The example notebooks also plot with matplotl
 import redcedar
 
 client = redcedar.connect(url="https://<server-url>", api_key="your-api-key")
-print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.2.0'}
+print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.93.0'}
 
 # Train on a CSV file (last column = class label) or a catalog dataset
 result = client.training.run("my_data.csv", verbose=True, settings={"num_qubits": 4, "max_layers": 2})

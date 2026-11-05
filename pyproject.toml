@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redcedar"
-version = "0.2.0"
+version = "0.93.0"
 description = "Python client for the Red Cedar quantum machine learning server"
 readme = "README.md"
 requires-python = ">=3.9"

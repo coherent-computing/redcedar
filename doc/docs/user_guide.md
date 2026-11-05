@@ -56,7 +56,7 @@ connects by default:
 import redcedar
 
 client = redcedar.connect()
-print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.2.0'}
+print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.93.0'}
 ```
 
 `status()` also tells you which versions you are using: the server's version (`client.server_version` gives it
