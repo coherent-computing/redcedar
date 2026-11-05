@@ -20,6 +20,7 @@ Version 0.9 is the first tagged version of Red Cedar. Each release below lists t
 - **Bug fix: seeded CUDA-Q runs** -- Two CUDA-Q runs with the same seed could give different results. Seeded runs now repeat.
 - **CUDA-Q explainable AI** -- Explainable AI on CUDA-Q is seeded and uses 10000 shots, so repeated runs on the same model give the same result. The shot count is temporary and will become a setting.
 - **Bug fix: fractional targets in CSV files with a header row** -- The target column of such a file was read as text, so a fractional regression target was detected as class labels. Targets that are numbers are now read as numbers.
+- **Bug fix: CSV files without a header row and with text class labels** -- The class label in the last column (for example `M`) made the first row look like a header, so the first sample was used as column names and not loaded. The header check now looks at the feature columns, and counts a text value at the top of the target column only when it doesn't occur again in that column (a column name, not a class label).
 - **Bug fix: split sizes for uploaded files** -- `train_size` and `test_size` were ignored for uploaded CSV files, which always used the 80/20 split.
 
 ### Release 0.92 - 2 November 2026
