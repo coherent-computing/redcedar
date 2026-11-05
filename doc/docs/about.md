@@ -34,7 +34,7 @@ The redcedar SDK is open source. See the LICENSE file in the repository for deta
 
 ## Version
 
-Current SDK version: **0.1.0**. Current server version: **0.92** (November 2026).
+Current SDK version: **0.2.0**. Current server version: **0.93** (November 2026).
 
 See [Release Notes](./release_notes.md) for version history.
 

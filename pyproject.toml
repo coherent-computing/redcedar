@@ -8,12 +8,17 @@ version = "0.2.0"
 description = "Python client for the Red Cedar quantum machine learning server"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 authors = [{name = "Cascade Quantum"}]
+keywords = ["quantum computing", "quantum machine learning", "machine learning", "explainable ai", "client", "sdk"]
 
 dependencies = [
     "requests>=2.28",
 ]
+
+[project.urls]
+Homepage = "https://github.com/coherent-computing/redcedar"
+Documentation = "https://coherent-computing.github.io/redcedar/"
 
 [project.scripts]
 redcedar = "redcedar.cli:main"
