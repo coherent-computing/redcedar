@@ -1,8 +1,5 @@
 # Red Cedar
 
-> The package is not on PyPI yet: install it from a clone of the repository (see the
-> [User Guide](user_guide.md#installation)).
-
 **Red Cedar** is a quantum machine learning framework from Cascade Quantum. You train models on quantum
 simulators and quantum computers without having to master the low-level details of quantum technology. You
 bring a table of data; Red Cedar builds, trains and runs the quantum circuits.

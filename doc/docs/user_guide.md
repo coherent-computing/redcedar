@@ -35,8 +35,7 @@ pip install redcedar
 The only dependency is `requests`. The example notebooks also plot with matplotlib:
 `pip install "redcedar[plotting]"`.
 
-Until the package is published on PyPI, install it from a clone of the repository (also the way to get the
-notebooks, or to read the source):
+To read the source, or to work on the SDK itself, install it from a clone of the repository instead:
 
 ```bash
 git clone https://github.com/coherent-computing/redcedar.git
