@@ -56,8 +56,11 @@ connects by default:
 import redcedar
 
 client = redcedar.connect()
-print(client.status())   # {'ok': True}
+print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.2.0'}
 ```
+
+`status()` also tells you which versions you are using: the server's version (`client.server_version` gives it
+on its own) and the SDK's. They are numbered separately: one SDK version works with many server versions.
 
 ### A Hosted Server
 
@@ -537,6 +540,7 @@ redcedar train my_data.csv --qubits 6 --layers 2 --seed 123
 redcedar evaluate <train_id>
 redcedar predict <train_id> new_data.csv -o predictions.csv
 redcedar models
+redcedar status
 ```
 
 | Command | Same as | Flags |
@@ -545,6 +549,7 @@ redcedar models
 | `redcedar evaluate` | `training.evaluate()` | `--layer`, `--backend` |
 | `redcedar predict` | `inference.run()`; prints the predictions, or writes them with `-o` | `--layer`, `--backend`, `-o` |
 | `redcedar models` | `inference.models()` | |
+| `redcedar status` | `status()`; prints the server's URL and version and the SDK version | |
 
 Any setting can come from a file: `--settings my_settings.toml`. Before the command, `--url` and `--api-key`
 choose the server, `--local path/to/red-cedar` uses [local mode](#local-mode-for-development), and `-q` turns

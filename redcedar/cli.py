@@ -4,6 +4,7 @@
     redcedar evaluate <train_id>
     redcedar predict <train_id> new_data.csv -o predictions.csv
     redcedar models
+    redcedar status
 
 The server comes from --url / --api-key, or REDCEDAR_URL / REDCEDAR_API_KEY.
 """
@@ -50,6 +51,7 @@ def main(argv=None):
     r.add_argument("--backend")
 
     sub.add_parser("models", help="list recently trained models")
+    sub.add_parser("status", help="check the server and show the server and SDK versions")
 
     args = p.parse_args(argv)
     client = connect(url=args.url, api_key=args.api_key, local=args.local or False)
@@ -111,6 +113,15 @@ def main(argv=None):
             for m in client.inference.models()["models"]:
                 print(m["train_id"], m.get("dataset_display_name") or m.get("dataset", ""),
                       m.get("task", ""), f"{m.get('num_qubits')} qubits", f"layers {m.get('layers')}")
+
+        elif args.command == "status":
+            s = client.status()
+            print(f"Server: {client.url}")
+            print(f"Server version: {s['server_version'] or 'unknown'}")
+            print(f"SDK version: {s['sdk_version']}")
+            if not s["ok"]:
+                print(f"Error: {s['error']}", file=sys.stderr)
+                return 1
 
     except (RuntimeError, requests.HTTPError, requests.ConnectionError, FileNotFoundError) as err:
         print(f"Error: {err}", file=sys.stderr)

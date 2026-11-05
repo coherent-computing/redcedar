@@ -16,6 +16,7 @@ Version 0.9 is the first tagged version of Red Cedar. Each release below lists t
 - **CSV files directly** -- `training.run()` and `inference.run()` take a CSV file path and upload it.
 - **Command line** -- The `redcedar` command: `redcedar train`, `evaluate`, `predict` and `models` (also `python -m redcedar`).
 - **Connecting** -- `connect()` defaults to `http://localhost:8002`. A hosted server requires an API key (see [Connecting to a Server](user_guide.md#connecting-to-a-server)). `connect(local="path/to/red-cedar")` runs the server inside your Python process, for development with the Red Cedar source.
+- **Versions** -- `client.status()` and `redcedar status` show the server's version and the SDK's. The SDK is now numbered separately from the server: this release is SDK 0.2.0 (it was 0.1.0).
 - **Bug fix: CUDA-Q server crash** -- A server running on CUDA-Q could crash after several training jobs. Fixed.
 - **Bug fix: seeded CUDA-Q runs** -- Two CUDA-Q runs with the same seed could give different results. Seeded runs now repeat.
 - **CUDA-Q explainable AI** -- Explainable AI on CUDA-Q is seeded and uses 10000 shots, so repeated runs on the same model give the same result. The shot count is temporary and will become a setting.

@@ -20,7 +20,7 @@ The only dependency is `requests`. The example notebooks also plot with matplotl
 import redcedar
 
 client = redcedar.connect(url="http://localhost:8002", api_key="your-api-key")
-print(client.status())   # {'ok': True}
+print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.2.0'}
 ```
 
 You can also set environment variables instead of passing arguments:
@@ -407,6 +407,7 @@ redcedar train my_data.csv --qubits 6 --layers 2 --seed 123    # prints the trai
 redcedar evaluate <train_id>
 redcedar predict <train_id> new_data.csv -o predictions.csv
 redcedar models
+redcedar status                                                # server and SDK versions
 ```
 
 `train` also takes `--settings my_settings.toml` (any setting), `--backend`, `--task regression` and `--test-size 0` (train on all rows); `evaluate` and `predict` take `--layer` and `--backend`. Run `redcedar <command> --help` for the details.

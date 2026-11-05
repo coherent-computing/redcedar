@@ -36,7 +36,7 @@ It listens on `http://localhost:8002`, which is where the SDK looks by default:
 import redcedar
 
 client = redcedar.connect()
-print(client.status())          # {'ok': True}
+print(client.status())          # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.2.0'}
 ```
 
 **A hosted server.** Pass its URL and your API key, or set them once in your shell as `REDCEDAR_URL` and

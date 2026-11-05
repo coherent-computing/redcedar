@@ -59,6 +59,7 @@ class RedCedarClient:
         self.url = url.rstrip("/")
         self.api_key = api_key
         self._last_job_id = None
+        self._server_version = None
         self.datasets = DatasetManager(self)
         self.analysis = AnalysisManager(self)
         self.training = TrainingManager(self)
@@ -206,9 +207,38 @@ class RedCedarClient:
         raise RuntimeError("SSE stream ended without done/error event")
 
     def status(self):
-        """Check server health."""
+        """Check the server, and which versions are in use.
+
+        Returns:
+            Dict with 'ok', 'server_version' (None if the server doesn't report
+            one) and 'sdk_version' (this package's version; the two are
+            numbered separately), plus 'error' when 'ok' is False.
+        """
+        from . import __version__
         try:
-            resp = requests.get(f"{self.url}/", headers=self._headers(), timeout=5)
-            return {"ok": resp.status_code == 200}
+            resp = requests.get(f"{self.url}/health", headers=self._headers(), timeout=5)
         except requests.ConnectionError:
-            return {"ok": False, "error": "Cannot reach server"}
+            return {"ok": False, "server_version": None, "sdk_version": __version__,
+                    "error": "Cannot reach server"}
+        try:
+            body = resp.json()
+        except ValueError:
+            body = {}
+        if not isinstance(body, dict):
+            body = {}
+        # Through the gateway (/api/health) the server's answer is under "backend"
+        server = body.get("backend", body)
+        if not isinstance(server, dict):
+            server = {}
+        ok = resp.status_code == 200 and server.get("status") == "ok"
+        result = {"ok": ok, "server_version": server.get("version"), "sdk_version": __version__}
+        if not ok:
+            result["error"] = server.get("error") or f"HTTP {resp.status_code}"
+        return result
+
+    @property
+    def server_version(self):
+        """The version of the server this client is connected to (asked once)."""
+        if self._server_version is None:
+            self._server_version = self.status().get("server_version")
+        return self._server_version
