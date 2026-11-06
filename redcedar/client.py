@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import time
+import threading
 import requests
 
 from .datasets import DatasetManager
@@ -52,6 +53,60 @@ def _raise_for_status(resp):
     raise requests.HTTPError(msg, response=resp)
 
 
+class _ProgressLine:
+    """A job's verbose output: one line, rewritten on each progress update, with a dot
+    added while the job is quiet so it's clear it's still working. The dots come every
+    2 seconds at first, every 5 after 20 seconds and every 10 after a minute, counted
+    from the last update."""
+
+    def __init__(self, out=None):
+        self._out = out or sys.stdout
+        self._lock = threading.Lock()
+        self._width = 0   # characters on the current line
+        self._restart()
+        self._stop = threading.Event()
+        threading.Thread(target=self._dots, daemon=True).start()
+
+    def _restart(self):
+        self._since = time.monotonic()
+        self._next = self._since + 2
+
+    def _dots(self):
+        while not self._stop.wait(0.5):
+            with self._lock:
+                now = time.monotonic()
+                if now >= self._next:
+                    print(".", end="", flush=True, file=self._out)
+                    self._width += 1
+                    quiet = now - self._since
+                    self._next = now + (2 if quiet < 20 else 5 if quiet < 60 else 10)
+
+    def update(self, text):
+        """Rewrite the line. Spaces clear what's left of a longer line (and its dots) in a
+        terminal; the second \\r puts the next dot right after the text."""
+        with self._lock:
+            pad = " " * max(self._width - len(text), 0)
+            print(f"\r{text}{pad}\r{text}", end="", flush=True, file=self._out)
+            self._width = len(text)
+            self._restart()
+
+    def message(self, text):
+        """A line of its own (a log line, an error), below the progress line."""
+        with self._lock:
+            if self._width:
+                print(file=self._out)
+            print(text, flush=True, file=self._out)
+            self._width = 0
+            self._restart()
+
+    def close(self):
+        self._stop.set()
+        with self._lock:
+            if self._width:
+                print(file=self._out)
+                self._width = 0
+
+
 class RedCedarClient:
     """Main client for interacting with the Red Cedar server."""
 
@@ -93,11 +148,16 @@ class RedCedarClient:
 
     def _run_local(self, fn, *args, verbose=False, on_progress=None, events=None, **kwargs):
         """Run a redcedar_core job function in this thread (local mode). Its events go
-        to the same handler as a server job's: progress, log lines (verbose), and the
+        to the same handler as a server job's: progress, log lines (verbose="log"), and the
         other events into the events list. Returns the job's result."""
         out = sys.stdout   # while the job runs, print() goes to its log
-        on_event = lambda e: self._handle_event(e, verbose, on_progress, events, out=out)  # noqa: E731
-        return self._local_call(fn, *args, on_event=on_event, **kwargs)
+        line = _ProgressLine(out) if verbose else None
+        on_event = lambda e: self._handle_event(e, verbose, on_progress, events, line)  # noqa: E731
+        try:
+            return self._local_call(fn, *args, on_event=on_event, **kwargs)
+        finally:
+            if line:
+                line.close()
 
     def _get(self, path):
         resp = requests.get(f"{self._server(path)}{path}", headers=self._headers())
@@ -125,9 +185,10 @@ class RedCedarClient:
         _raise_for_status(resp)
         return resp.json()
 
-    def _open_stream(self, path, verbose=False):
+    def _open_stream(self, path, line=None):
         """Open a job's SSE stream. A queued job has no stream until it starts
         (the server answers 404), so wait for it to start."""
+        waiting = False
         while True:
             resp = requests.get(
                 f"{self._server(path)}{path}",
@@ -144,13 +205,14 @@ class RedCedarClient:
             if not qs.get("total"):
                 # Nothing queued or running, so the job is gone
                 _raise_for_status(resp)
-            if verbose:
-                print("\r  Waiting in queue...", end="", flush=True)
+            if line and not waiting:
+                line.update("  Waiting in queue...")
+            waiting = True
             time.sleep(2)
 
-    def _stream_sse(self, path, verbose=False):
+    def _stream_sse(self, path, line=None):
         """Consume an SSE stream, yielding parsed events."""
-        resp = self._open_stream(path, verbose)
+        resp = self._open_stream(path, line)
 
         event_type = "message"
         data_buf = ""
@@ -194,51 +256,66 @@ class RedCedarClient:
         except Exception:
             pass
 
-        for event in self._stream_sse(stream_path.format(job_id=job_id), verbose):
-            self._handle_event(event, verbose, on_progress, events)
-            etype = event.get("_event", event.get("type", ""))
-            if etype == "done":
-                return event.get("summary", event)
-            elif etype == "error":
-                raise RuntimeError(event.get("message", "Job failed"))
-            elif etype == "stopped":
-                raise RuntimeError(event.get("message", "Job stopped"))
+        line = _ProgressLine() if verbose else None
+        try:
+            for event in self._stream_sse(stream_path.format(job_id=job_id), line):
+                self._handle_event(event, verbose, on_progress, events, line)
+                etype = event.get("_event", event.get("type", ""))
+                if etype == "done":
+                    return event.get("summary", event)
+                elif etype == "error":
+                    raise RuntimeError(event.get("message", "Job failed"))
+                elif etype == "stopped":
+                    raise RuntimeError(event.get("message", "Job stopped"))
+        finally:
+            if line:
+                line.close()
 
         raise RuntimeError("SSE stream ended without done/error event")
 
-    def _handle_event(self, event, verbose, on_progress, events, out=None):
-        """Report one job event: progress and messages (verbose), the on_progress
-        callback, and the other events into the events list."""
+    def _handle_event(self, event, verbose, on_progress, events, line=None):
+        """Report one job event: progress and messages (verbose; the server's log lines
+        only with verbose="log"), the on_progress callback, and the other events into
+        the events list. line is the job's _ProgressLine when verbose."""
         etype = event.get("_event", event.get("type", ""))
 
         if etype == "progress":
             pct = event.get("percent", 0)
             msg = event.get("message", "")
             if verbose:
-                print(f"\r  [{pct:3d}%] {msg}", end="", flush=True, file=out)
+                line.update(f"  [{pct:3d}%] {msg}")
             if on_progress:
                 on_progress(pct, msg)
 
         elif etype == "done":
             if verbose:
-                print(f"\r  [100%] Done.{'':40}", file=out)
+                line.update("  [100%] Done.")
+                line.close()
 
         elif etype == "log":
-            if verbose:
+            if verbose == "log":
                 msg = event.get("message", "")
                 if msg:
-                    print(f"  {msg}", file=out)
+                    line.message(f"  {msg}")
 
         elif etype == "error":
             if verbose:
-                print(f"\n  ERROR: {event.get('message', 'Job failed')}", file=out)
+                line.message(f"  ERROR: {event.get('message', 'Job failed')}")
 
         elif etype == "stopped":
             if verbose:
-                print(f"\n  {event.get('message', 'Job stopped')}", file=out)
+                line.message(f"  {event.get('message', 'Job stopped')}")
 
-        elif events is not None:
-            events.append(event)
+        else:
+            # A training layer's test result
+            if etype == "validation" and verbose:
+                acc, loss = event.get("test_accuracy"), event.get("test_loss")
+                if acc is not None:
+                    line.message(f"  Layer {event.get('layer')}: test accuracy {acc:.1%}")
+                elif loss is not None:
+                    line.message(f"  Layer {event.get('layer')}: test loss {loss:.4f}")
+            if events is not None:
+                events.append(event)
 
     def status(self):
         """Check the server, and which versions are in use.

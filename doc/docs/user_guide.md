@@ -169,7 +169,7 @@ Trains a model and waits until training ends.
 |----------|------|---------|-------------|
 | `data` | str | required | A CSV file path, a dataset ID from `datasets.upload()`, or a catalog ID |
 | `settings` | dict or str | `None` | Settings to change, as a dict or a `.json` / `.toml` file path (see [Settings](#settings)) |
-| `verbose` | bool | `False` | Print progress to stdout |
+| `verbose` | bool or `"log"` | `False` | Print progress to stdout; `"log"` adds the server's log ([Progress](#progress)) |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
 | `train_size` | float or int | `0.8` | Training set size, as a fraction or a number of rows |
 | `test_size` | float or int | `0.2` | Test set size, as a fraction or a number of rows; `0` trains on all rows |
@@ -274,7 +274,7 @@ same split from the model's saved settings.
 | `train_id` | str | required | The model, from `training.run()` |
 | `layer` | int | highest layer | Which layer of the model to score |
 | `settings` | dict | `None` | Execution settings only (`backend`, `parallelize`), e.g. to score on a different backend |
-| `verbose` | bool | `False` | Print progress to stdout |
+| `verbose` | bool or `"log"` | `False` | Print progress to stdout; `"log"` adds the server's log ([Progress](#progress)) |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
 
 ```python
@@ -320,7 +320,7 @@ Runs a trained model on new rows and returns one result per row.
 | `layer` | int | highest layer | Which layer of the model to use |
 | `output` | str | `None` | Also write the results to this CSV file |
 | `settings` | dict | `None` | Execution settings only (`backend`, `parallelize`) |
-| `verbose` | bool | `False` | Print progress to stdout |
+| `verbose` | bool or `"log"` | `False` | Print progress to stdout; `"log"` adds the server's log ([Progress](#progress)) |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
 
 ```python
@@ -386,7 +386,7 @@ prediction.
 |----------|------|---------|-------------|
 | `train_id` | str | required | The model, from `training.run()` |
 | `settings` | dict | `None` | Execution settings only (`backend`, `parallelize`) |
-| `verbose` | bool | `False` | Print progress to stdout |
+| `verbose` | bool or `"log"` | `False` | Print progress to stdout; `"log"` adds the server's log ([Progress](#progress)) |
 | `on_progress` | callable | `None` | Called with `(percent, message)` on each update |
 
 ```python
@@ -571,8 +571,9 @@ redcedar status
 | `redcedar status` | `status()`; prints the server's URL and version and the SDK version | |
 
 Any setting can come from a file: `--settings my_settings.toml`. Before the command, `--url` and `--api-key`
-choose the server, `--local` uses [local mode](#local-mode-for-development), and `-q` turns
-off the progress output. Run `redcedar <command> --help` for the details.
+choose the server, `--local` uses [local mode](#local-mode-for-development), `-q` turns
+off the progress output, and `--log` adds the server's log for the job. Run `redcedar <command> --help` for
+the details.
 
 If the `redcedar` command isn't found (pip's scripts folder isn't on your PATH, which is common on Windows and
 with conda), use `python -m redcedar` instead: `python -m redcedar train my_data.csv`.
@@ -583,9 +584,12 @@ with conda), use `python -m redcedar` instead: `python -m redcedar train my_data
 
 All long-running calls take `verbose` and `on_progress`, which can be used together:
 
-- **`verbose=True`** prints a single updating line, such as `[  30%] Layer 1/2`, plus the server's log lines for
-  the job (training output, results per layer). While the job waits in the queue it prints `Waiting in
-  queue...`.
+- **`verbose=True`** prints a single updating line, such as `[  30%] Layer 1/2`, and the test result after each
+  layer of a training run. While the job is working, a dot is added to the line every few seconds (every 2
+  seconds at first, then every 5, then every 10 on a long step). While the job waits in the queue it prints
+  `Waiting in queue...`.
+- **`verbose="log"`** prints the same, plus the server's full log for the job (the training output of every
+  iteration, timings, the model's structure). It's meant for finding out what went wrong.
 - **`on_progress`** is called with `(percent, message)` on each update, for your own progress bars or logging.
 
 ```python

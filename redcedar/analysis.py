@@ -12,7 +12,7 @@ class AnalysisManager:
 
         Args:
             dataset_id: Dataset ID from the catalog (e.g., 'wdbc', 'iris').
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
 
         Returns:
@@ -34,7 +34,7 @@ class AnalysisManager:
 
         Args:
             dataset_id: Dataset ID from the catalog.
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
 
         Returns:
@@ -56,7 +56,7 @@ class AnalysisManager:
 
         Args:
             dataset_id: Dataset ID from the catalog.
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
 
         Returns:

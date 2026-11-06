@@ -24,7 +24,7 @@ class InferenceManager:
             layer: Optional layer number to use (default: highest layer).
             output: Optional CSV file path to write the input rows plus the
                     predictions to.
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 

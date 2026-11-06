@@ -26,6 +26,7 @@ def main(argv=None):
                         "(redcedar_core, installed with pip install -e, or the red-cedar folder "
                         "in REDCEDAR_CORE_PATH)")
     p.add_argument("-q", "--quiet", action="store_true", help="no progress output")
+    p.add_argument("--log", action="store_true", help="also print the server's log for the job")
     sub = p.add_subparsers(dest="command", required=True)
 
     t = sub.add_parser("train", help="train a model on a CSV file or catalog dataset")
@@ -57,7 +58,7 @@ def main(argv=None):
 
     args = p.parse_args(argv)
     client = connect(url=args.url, api_key=args.api_key, local=args.local or False)
-    verbose = not args.quiet
+    verbose = False if args.quiet else "log" if args.log else True
     run_settings = {"backend": args.backend} if getattr(args, "backend", None) else None
 
     try:

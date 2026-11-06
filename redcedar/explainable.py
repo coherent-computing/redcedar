@@ -15,7 +15,7 @@ class ExplainableManager:
 
         Args:
             train_id: Training job ID (from training.run() result).
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 

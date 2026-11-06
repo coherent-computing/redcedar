@@ -27,7 +27,7 @@ class TrainingManager:
                         datasets.upload(), or any OpenML dataset name.
             settings: Optional overrides — dict, .json path, or .toml path.
                       Only specified keys override server defaults.
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
             train_size: Optional training set size (fraction or count).
             test_size: Optional test set size (fraction or count). 0 trains on
@@ -103,7 +103,7 @@ class TrainingManager:
         Args:
             train_id: Training job ID (from training.run() result).
             layer: Optional layer number to score (default: highest layer).
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 
@@ -133,7 +133,7 @@ class TrainingManager:
         Args:
             train_id: Training job ID (from training.run() result).
             layer: Optional layer number (default: last layer).
-            verbose: Print progress to stdout.
+            verbose: Print progress to stdout; "log" also prints the server's log for the job.
             on_progress: Callback(percent, message) for progress updates.
 
         Returns:
