@@ -144,7 +144,8 @@ There is much more you can control. The [User Guide](user_guide.md) covers it al
   quantum computer.
 - **[The command line](user_guide.md#command-line):** `redcedar train my_data.csv`, without writing any Python.
 
-The [Examples](examples.md) have complete notebooks for each of these.
+The [Examples](examples.md) have notebooks for analyzing a dataset, the training settings, and training and
+evaluating a model in depth.
 
 <br>
 &copy; 2026 Cascade Quantum. All Rights Reserved.
