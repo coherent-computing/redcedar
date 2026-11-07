@@ -22,6 +22,7 @@ notebook is saved with the output of a run, so you can read the results and plot
 | `02_dataset_analysis.ipynb` | How to understand a dataset before training: PCA, mutual information and quantum resource estimation, comparing two datasets, and analyzing your own CSV file |
 | `03_training_settings.ipynb` | How training settings change a model, one section per setting: `seed` (repeatable runs) and `op_direction` (order of the operators), and the settings saved with each model |
 | `04_training_in_depth.ipynb` | A closer look at training: loss and accuracy during training, layers and layer chaining, test accuracy over the course of training, results per class and per layer, choosing the train and test data, reusing trained models, and checking on or stopping a running job |
+| `05_regression.ipynb` | The Quick Start's steps for regression, where the model predicts a number: train, measure the model on its test rows (mean absolute error), predict values for samples in a second file, and check the predicted values. Regression does not work well yet in this release: the predictions are currently further off than guessing the average |
 
 ## Scripts
 

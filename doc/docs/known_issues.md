@@ -58,9 +58,13 @@ These are not bugs per se, but behaviors worth knowing about.
 
 These are specific bugs or issues that may be fixed in future releases.
 
+#### Regression
+
+- **Regression predictions are not useful yet.** On the Energy Efficiency example (`05_regression.ipynb` in the examples), the model predicts about the same value for every sample, near the top of the target range, and its mean absolute error is larger than that of always predicting the average training value. The training loss falls while the test loss does not improve. Classification is not affected.
+
 #### Output
 
-- **Training prints a `DEBUG:` line on every parameter update.** The line comes from `quantum_learning/optimizer.py` and makes training logs much longer. It does not affect results.
+- **Training logs a `DEBUG:` line on every parameter update.** The line comes from `quantum_learning/optimizer.py` and makes the server's training log much longer. The SDK shows it only with `verbose="log"`. It does not affect results.
 
 #### Tests
 
