@@ -126,7 +126,9 @@ for q in explanation["qubit_map"]:
 ```
 
 Each data qubit of the model encodes one input feature, and `importance` measures how much that qubit influences
-the prediction. See [Explainable AI](user_guide.md#explainable-ai) in the User Guide.
+the prediction. By default Red Cedar first combines your columns into new features (principal components); train
+with `settings={"dimension_reduction": "none"}` to keep your own columns, so that the results name them. See
+[Explainable AI](user_guide.md#explainable-ai) in the User Guide.
 
 ## What Next
 

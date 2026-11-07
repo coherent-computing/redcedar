@@ -406,6 +406,20 @@ Shows which input features drive the model's decisions. It uses the highest laye
 is mapped back to the input feature it encodes, and `importance` measures how much that qubit influences the
 prediction.
 
+What a data qubit encodes depends on the `dimension_reduction` setting. With `"dimension_reduction": "none"`,
+each data qubit encodes one of your columns, and `feature_name` is that column's name. By default (`"pca"`), the
+columns are first combined into principal components, each a mix of all of them: `feature_name` is the
+component (`PC1`, `PC2`, ...), and `made_of` lists the columns with the largest shares of it, largest first, with
+the rest summed:
+
+```python
+{"parts": [{"feature": "worst_perimeter", "share": 0.49}, {"feature": "worst_radius", "share": 0.23}, ...],
+ "others": {"count": 26, "share": 0.13}}
+```
+
+The shares of all the columns add up to 1. A component with one or two large shares stands mostly for those
+columns; one with many small shares is a broad mix.
+
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `train_id` | str | required | The model, from `training.run()` |
@@ -424,7 +438,8 @@ for qid, val in explanation["convergence"].items():
 ```
 
 Returns a dict with `train_id`, `layer`, `dataset_name`, `num_qubits`, `num_class_qubits`, `class_range`,
-`qubit_map` (a list of dicts with `qubit`, `feature_index`, `feature_name`, `bits`, `bit`, `importance`),
+`qubit_map` (a list of dicts with `qubit`, `feature_index`, `feature_name`, `bits`, `bit`, `made_of`,
+`importance`),
 `convergence` (class qubit ID to convergence value), `distributions`, `feature_indices`, and timings.
 
 ## Dataset Analysis
