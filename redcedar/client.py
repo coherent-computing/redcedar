@@ -62,6 +62,8 @@ class _ProgressLine:
     def __init__(self, out=None):
         self._out = out or sys.stdout
         self._lock = threading.Lock()
+        self._text = ""
+        self._ndots = 0
         self._width = 0   # characters on the current line
         self._restart()
         self._stop = threading.Event()
@@ -71,23 +73,29 @@ class _ProgressLine:
         self._since = time.monotonic()
         self._next = self._since + 2
 
+    def _draw(self):
+        """Write the whole line again, text and dots. Jupyter treats \\r as overwriting
+        the line from its start, so the line is always redrawn rather than added to;
+        trailing spaces clear what's left of a longer line."""
+        s = self._text + "." * self._ndots
+        print(f"\r{s}{' ' * max(self._width - len(s), 0)}", end="", flush=True, file=self._out)
+        self._width = len(s)
+
     def _dots(self):
         while not self._stop.wait(0.5):
             with self._lock:
                 now = time.monotonic()
                 if now >= self._next:
-                    print(".", end="", flush=True, file=self._out)
-                    self._width += 1
+                    self._ndots += 1
+                    self._draw()
                     quiet = now - self._since
                     self._next = now + (2 if quiet < 20 else 5 if quiet < 60 else 10)
 
     def update(self, text):
-        """Rewrite the line. Spaces clear what's left of a longer line (and its dots) in a
-        terminal; the second \\r puts the next dot right after the text."""
+        """Rewrite the line with new text; the dots start again."""
         with self._lock:
-            pad = " " * max(self._width - len(text), 0)
-            print(f"\r{text}{pad}\r{text}", end="", flush=True, file=self._out)
-            self._width = len(text)
+            self._text, self._ndots = text, 0
+            self._draw()
             self._restart()
 
     def message(self, text):
@@ -96,7 +104,7 @@ class _ProgressLine:
             if self._width:
                 print(file=self._out)
             print(text, flush=True, file=self._out)
-            self._width = 0
+            self._text, self._ndots, self._width = "", 0, 0
             self._restart()
 
     def close(self):
@@ -104,7 +112,7 @@ class _ProgressLine:
         with self._lock:
             if self._width:
                 print(file=self._out)
-                self._width = 0
+                self._text, self._ndots, self._width = "", 0, 0
 
 
 class RedCedarClient:

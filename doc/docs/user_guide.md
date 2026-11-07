@@ -206,6 +206,30 @@ for layer, v in model["validation"].items():
     print(f"Layer {layer}: test accuracy {v['test_accuracy']:.1%}")
 ```
 
+### Training Loss and Accuracy
+
+While a model trains, Red Cedar measures two numbers on the training rows after every parameter update, and
+returns them in `history`:
+
+- **Training loss.** For each row, the circuit gives a probability for every class. The row's loss is 1 minus
+  the probability of its correct class: 0 when the model is certain of the right class, 1 when it gives that
+  class no chance. The training loss is the average of these over the training rows, plus 10 times their
+  variance. The variance term makes the optimizer prefer a model that does about equally well on every row
+  over one that is very sure of some rows and wrong on others. Each parameter update is chosen to lower this
+  loss.
+- **Training accuracy.** The share of training rows whose correct class gets the highest probability, that is,
+  the rows the model classifies correctly.
+
+The test loss and test accuracy in `validation`, and from `training.evaluate()`, are the same two measures on
+the rows held back from training. The training numbers are measured on rows the model learns from, so they
+usually look better than the test numbers; the test numbers tell you how the model will do on new data.
+
+On a plot of the training curves, the loss usually falls quickly at first and then levels off. Once a layer's
+curve is flat, more parameter updates in that layer change little.
+
+For a regression model, the loss measures how far the predicted number is from the target, as set by
+`loss_type` (default `"weighted_hamming"`), and there is no training accuracy.
+
 ### Train and Test Rows
 
 Every training run splits the data: by default 80% of the rows train the model and 20% are held back for
