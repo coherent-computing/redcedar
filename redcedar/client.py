@@ -77,7 +77,7 @@ class _ProgressLine:
         """Write the whole line again, text and dots. Jupyter treats \\r as overwriting
         the line from its start, so the line is always redrawn rather than added to;
         trailing spaces clear what's left of a longer line."""
-        s = self._text + "." * self._ndots
+        s = self._text + (" " + "." * self._ndots if self._ndots else "")
         print(f"\r{s}{' ' * max(self._width - len(s), 0)}", end="", flush=True, file=self._out)
         self._width = len(s)
 
