@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://coherent-computing.github.io/redcedar/user_guide/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>User Guide - Red Cedar</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../css/custom.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Red Cedar</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../quick_start/" class="nav-link">Quick Start</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">User Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../release_notes/" class="nav-link">Releases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../known_issues/" class="nav-link">PAL</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../quick_start/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../examples/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#user-guide" class="nav-link">User Guide</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#how-red-cedar-works" class="nav-link">How Red Cedar Works</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#installation" class="nav-link">Installation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#connecting-to-a-server" class="nav-link">Connecting to a Server</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#data" class="nav-link">Data</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#training" class="nav-link">Training</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#evaluating-a-model" class="nav-link">Evaluating a Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#predictions" class="nav-link">Predictions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#explainable-ai" class="nav-link">Explainable AI</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#dataset-analysis" class="nav-link">Dataset Analysis</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#settings" class="nav-link">Settings</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#running-on-quantum-hardware" class="nav-link">Running on Quantum Hardware</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#command-line" class="nav-link">Command Line</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#progress-and-errors" class="nav-link">Progress and Errors</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#limitations" class="nav-link">Limitations</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="user-guide">User Guide</h1>
+<p>This guide is the complete reference for the <strong>redcedar</strong> Python SDK: every call, its arguments and what it
+returns, the settings, and the command line. For a first walkthrough, start with the
+<a href="../quick_start/">Quick Start</a>.</p>
+<h2 id="how-red-cedar-works">How Red Cedar Works</h2>
+<p>A Red Cedar model is a parameterized quantum circuit that learns to map your input features to an answer. The
+SDK sends your data and settings to a Red Cedar server; the server prepares the data, builds the circuits, runs
+them on a simulator or a quantum computer, and trains the parameters. Results come back to the SDK as plain
+Python values (dicts and lists).</p>
+<p>The work has three steps, and the SDK groups its calls the same way:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Call</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td><code>training.run()</code></td>
+<td>Trains a model on your data.</td>
+</tr>
+<tr>
+<td>Evaluate (optional)</td>
+<td><code>training.evaluate()</code></td>
+<td>Scores the model on the rows held back from its own training run: how good is it?</td>
+</tr>
+<tr>
+<td>Use</td>
+<td><code>inference.run()</code></td>
+<td>Makes predictions on new rows you supply.</td>
+</tr>
+</tbody>
+</table>
+<p><code>training</code> holds everything about building a model and judging it; <code>inference</code> holds using it. Alongside these
+are <code>datasets</code>, <code>analysis</code> (understanding a dataset before training) and <code>explainable</code> (what the model relies
+on).</p>
+<p>Long-running calls wait until the server has finished and then return the result. The server runs one job at a
+time; if it is busy, your job waits in a queue and starts when the job before it finishes.</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="language-bash">pip install redcedar
+</code></pre>
+<p>The only dependency is <code>requests</code>. The example notebooks also plot with matplotlib:
+<code>pip install "redcedar[plotting]"</code>.</p>
+<p>To read the source, or to work on the SDK itself, install it from a clone of the repository instead:</p>
+<pre><code class="language-bash">git clone https://github.com/coherent-computing/redcedar.git
+cd redcedar
+pip install -e .
+</code></pre>
+<h2 id="connecting-to-a-server">Connecting to a Server</h2>
+<h3 id="a-server-on-your-own-machine">A Server on Your Own Machine</h3>
+<p>If you have the Red Cedar engine installed, start its server from the <code>red-cedar</code> folder with <code>./run_server.sh</code>
+(Linux, Mac) or <code>run_server.bat</code> (Windows). It listens on port 8002, and the SDK connects to
+<code>http://127.0.0.1:8002</code> by default. The server only accepts requests with the key that the script sets (the line
+<code>export BACKEND_API_KEY=...</code> in <code>run_server.sh</code>, <code>set BACKEND_API_KEY=...</code> in <code>run_server.bat</code>). Pass the same
+key to <code>connect()</code>, or set it once as <code>REDCEDAR_API_KEY</code>:</p>
+<pre><code class="language-python">import redcedar
+
+client = redcedar.connect(api_key=&quot;&lt;the BACKEND_API_KEY value from run_server.sh&gt;&quot;)
+print(client.status())   # {'ok': True, 'server_version': '0.93', 'sdk_version': '0.93.0'}
+</code></pre>
+<p>Without the key, <code>status()</code> and <code>datasets.list()</code> still work, but training, analysis, inference and explainable
+AI are refused (<code>422</code>, no key; <code>403</code>, a wrong key). This key belongs to the server itself. A hosted server uses
+your personal API key instead (next section).</p>
+<p><code>status()</code> also tells you which versions you are using: the server's version (<code>client.server_version</code> gives it
+on its own) and the SDK's. The SDK's version follows the server's (SDK 0.93.x goes with server 0.93).</p>
+<p>In <code>REDCEDAR_URL</code>, use <code>127.0.0.1</code> rather than <code>localhost</code> for a server on your own machine. On Windows,
+<code>localhost</code> is tried first as IPv6 (<code>::1</code>), which the server doesn't listen on, and every request then waits
+about 2 seconds.</p>
+<h3 id="a-hosted-server">A Hosted Server</h3>
+<p>Pass the URL of the hosted server and your API key:</p>
+<pre><code class="language-python">client = redcedar.connect(url=&quot;https://&lt;hosted-server-url&gt;&quot;, api_key=&quot;your-api-key&quot;)
+</code></pre>
+<p>Or set environment variables once, and call <code>redcedar.connect()</code> with no arguments:</p>
+<pre><code class="language-bash">export REDCEDAR_URL=&quot;https://&lt;hosted-server-url&gt;&quot;
+export REDCEDAR_API_KEY=&quot;your-api-key&quot;
+</code></pre>
+<p>Explicit arguments take priority over environment variables. A hosted server only accepts requests with a valid
+API key; without one, every call fails with <code>401</code> (no key or an unknown key) or <code>403</code> (a key without access).</p>
+<p><strong>Getting a key.</strong> Contact your Cascade Quantum representative to get an API key, or to get access to the Red
+Cedar user interface. If you already have access to the user interface, you can create your own key there,
+under <strong>API Keys</strong>. Keep the key private: it acts as you. You have one key at a time; a new key replaces the
+old one, which then stops working.</p>
+<h3 id="local-mode-for-development">Local Mode, for Development</h3>
+<p>With the Red Cedar source and its dependencies in your Python environment, the SDK can call the Red Cedar code
+directly, with no server. Install the source once, from the <code>red-cedar</code> folder:</p>
+<pre><code class="language-bash">pip install -e .
+</code></pre>
+<p>Then connect in local mode:</p>
+<pre><code class="language-python">client = redcedar.connect(local=True)
+</code></pre>
+<p>Every SDK call then runs the same function the server runs for it, in your own Python process and thread: no
+server, no port, no HTTP. Results are the same as through a server, and a debugger steps from the SDK call
+straight into the Red Cedar code. Without the install, pass the folder instead (<code>connect(local="path/to/red-cedar")</code>,
+or set <code>REDCEDAR_CORE_PATH</code>).</p>
+<p>Local mode uses the datasets, trained models and job records of that <code>red-cedar</code> folder, the same ones a server
+started from it uses: a model trained through the server can be evaluated locally, and the other way round.
+Ctrl+C stops a local training run, as <code>training.stop()</code> does; the layers that finished are kept.</p>
+<h2 id="data">Data</h2>
+<h3 id="your-own-data">Your Own Data</h3>
+<p>Red Cedar trains on tables: one row per example, input features first, and the <strong>last column is the target</strong>,
+the answer the model learns. A CSV file is the usual way to provide one.</p>
+<ul>
+<li><strong>Header row:</strong> optional. A first row counts as a header when any of its cells is text. With a header, Red
+  Cedar knows your columns by name, which <code>inference.run()</code> uses to match new files and explainable AI uses to
+  name features. Without one, columns are known by position only.</li>
+<li><strong>One caveat:</strong> a file without a header whose last column holds text labels (such as <code>M</code>/<code>B</code>) has text in its
+  first row and would be read as having a header. Give such files a header row.</li>
+<li><strong>Features</strong> are numbers. Red Cedar scales, normalizes and compresses them as part of training (see
+  <a href="#data-preparation">Data preparation</a> under Settings).</li>
+</ul>
+<p>Pass the path of a CSV file wherever a dataset is expected:</p>
+<pre><code class="language-python">model = client.training.run(&quot;my_data.csv&quot;)
+</code></pre>
+<p>The file is uploaded each time. To upload once and reuse it, use <code>datasets.upload()</code>, which returns a dataset
+ID:</p>
+<pre><code class="language-python">dataset_id = client.datasets.upload(&quot;my_data.csv&quot;)
+model = client.training.run(dataset_id, settings={&quot;num_qubits&quot;: 6})
+</code></pre>
+<h3 id="the-dataset-catalog">The Dataset Catalog</h3>
+<p>The server also has a catalog of ready-to-use datasets, such as <code>"wdbc"</code>, <code>"iris"</code> and <code>"diabetes"</code>.</p>
+<pre><code class="language-python">for ds in client.datasets.list():
+    print(ds[&quot;id&quot;], ds[&quot;name&quot;], ds.get(&quot;rows&quot;), ds.get(&quot;classes&quot;))
+</code></pre>
+<p>Each entry is a dict. The most useful fields: <code>id</code>, <code>name</code>, <code>description</code>, <code>category</code>, <code>source</code>, <code>rows</code>,
+<code>columns</code>, <code>classes</code>, <code>available</code>. The <code>id</code> is what you pass to the analysis and training calls.</p>
+<h2 id="training">Training</h2>
+<h3 id="clienttrainingrundata-settingsnone-verbosefalse-on_progressnone-train_sizenone-test_sizenone-class_rangenone-tasknone"><code>client.training.run(data, settings=None, verbose=False, on_progress=None, train_size=None, test_size=None, class_range=None, task=None)</code></h3>
+<p>Trains a model and waits until training ends.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data</code></td>
+<td>str</td>
+<td>required</td>
+<td>A CSV file path, a dataset ID from <code>datasets.upload()</code>, or a catalog ID</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>dict or str</td>
+<td><code>None</code></td>
+<td>Settings to change, as a dict or a <code>.json</code> / <code>.toml</code> file path (see <a href="#settings">Settings</a>)</td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td>bool or <code>"log"</code></td>
+<td><code>False</code></td>
+<td>Print progress to stdout; <code>"log"</code> adds the server's log (<a href="#progress">Progress</a>)</td>
+</tr>
+<tr>
+<td><code>on_progress</code></td>
+<td>callable</td>
+<td><code>None</code></td>
+<td>Called with <code>(percent, message)</code> on each update</td>
+</tr>
+<tr>
+<td><code>train_size</code></td>
+<td>float or int</td>
+<td><code>0.8</code></td>
+<td>Training set size, as a fraction or a number of rows</td>
+</tr>
+<tr>
+<td><code>test_size</code></td>
+<td>float or int</td>
+<td><code>0.2</code></td>
+<td>Test set size, as a fraction or a number of rows; <code>0</code> trains on all rows</td>
+</tr>
+<tr>
+<td><code>class_range</code></td>
+<td>list</td>
+<td>all classes</td>
+<td>Classes to train on, e.g. <code>["0", "1"]</code> (catalog datasets only)</td>
+</tr>
+<tr>
+<td><code>task</code></td>
+<td>str</td>
+<td>detected</td>
+<td><code>"classification"</code> or <code>"regression"</code> (see <a href="#classification-or-regression">Classification or Regression</a>)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">model = client.training.run(&quot;my_data.csv&quot;, verbose=True, settings={
+    &quot;num_qubits&quot;: 6,
+    &quot;min_layers&quot;: 1,
+    &quot;max_layers&quot;: 2,
+})
+
+train_id = model[&quot;train_id&quot;]
+</code></pre>
+<p>Returns a dict with <code>train_id</code>, <code>task</code>, <code>train_samples</code>, <code>test_samples</code>, <code>total_layers</code>, <code>elapsed_seconds</code>,
+<code>data_loading_seconds</code>, plus:</p>
+<ul>
+<li><code>history</code>: the training curves, by layer. Each layer has a list of <code>{iteration, train_loss, train_accuracy}</code>
+  (no <code>train_accuracy</code> for regression).</li>
+<li><code>validation</code>: the test results at the end of each layer, by layer: <code>test_loss</code>, <code>test_accuracy</code>,
+  <code>test_accuracy_per_class</code>, <code>test_loss_per_class</code>, <code>num_parameters</code> and timings. Regression has <code>test_loss</code>
+  only. With <code>test_size=0</code> the test values are <code>None</code>.</li>
+</ul>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+
+for layer, points in model[&quot;history&quot;].items():
+    plt.plot([p[&quot;train_loss&quot;] for p in points], label=f&quot;layer {layer}&quot;)
+plt.xlabel(&quot;Iteration&quot;); plt.ylabel(&quot;Training loss&quot;); plt.legend()
+
+for layer, v in model[&quot;validation&quot;].items():
+    print(f&quot;Layer {layer}: test accuracy {v['test_accuracy']:.1%}&quot;)
+</code></pre>
+<h3 id="training-loss-and-accuracy">Training Loss and Accuracy</h3>
+<p>While a model trains, Red Cedar measures two numbers on the training rows after every parameter update, and
+returns them in <code>history</code>:</p>
+<ul>
+<li><strong>Training loss.</strong> For each row, the circuit gives a probability for every class. The row's loss is 1 minus
+  the probability of its correct class: 0 when the model is certain of the right class, 1 when it gives that
+  class no chance. The training loss is the average of these over the training rows, plus 10 times their
+  variance. The variance term makes the optimizer prefer a model that does about equally well on every row
+  over one that is very sure of some rows and wrong on others. Each parameter update is chosen to lower this
+  loss.</li>
+<li><strong>Training accuracy.</strong> The share of training rows whose correct class gets the highest probability, that is,
+  the rows the model classifies correctly.</li>
+</ul>
+<p>The test loss and test accuracy in <code>validation</code>, and from <code>training.evaluate()</code>, are the same two measures on
+the rows held back from training. The training numbers are measured on rows the model learns from, so they
+usually look better than the test numbers; the test numbers tell you how the model will do on new data.</p>
+<p>On a plot of the training curves, the loss usually falls quickly at first and then levels off. Once a layer's
+curve is flat, more parameter updates in that layer change little.</p>
+<p>For a regression model, the loss measures how far the predicted number is from the target, as set by
+<code>loss_type</code> (default <code>"weighted_hamming"</code>), and there is no training accuracy.</p>
+<h3 id="train-and-test-rows">Train and Test Rows</h3>
+<p>Every training run splits the data: by default 80% of the rows train the model and 20% are held back for
+testing. The split is stratified by class (each class keeps its share in both parts) and is the same every
+time for the same data. The held-out rows are what training tests at the end of each layer, and what
+<code>training.evaluate()</code> scores.</p>
+<p>Holding rows back is what makes the test accuracy honest: accuracy measured on the training rows overstates
+how the model does on new data. The usual pattern when you want the final model to learn from everything:</p>
+<ol>
+<li>Train with the default split and check the test results.</li>
+<li>If they're good, train again with the same settings and <code>test_size=0</code>, and use that model for predictions.</li>
+</ol>
+<p>With <code>test_size=0</code> there is no held-out score: the test values in the layer results are <code>None</code>, and
+<code>training.evaluate()</code> and <code>training.analyze()</code> stop with an error saying the model has no test rows. To measure
+such a model, make predictions on rows that include the target column.</p>
+<h3 id="layers">Layers</h3>
+<p>A model is trained one layer at a time, from <code>min_layers</code> to <code>max_layers</code>. Each layer adds a set of parameters
+to the circuit; by default (<code>chain_layers=True</code>) a layer starts from the parameters the layer before it found.
+Every finished layer is saved, and later calls take <code>layer=</code> to pick one (the highest by default).</p>
+<h3 id="classification-or-regression">Classification or Regression</h3>
+<p>The task is decided when the model is trained, and saved with it. Without <code>task=</code>, Red Cedar detects it from a
+CSV file's target column: text labels or whole numbers mean <strong>classification</strong>, numbers with fractions mean
+<strong>regression</strong> (catalog datasets are classification). A target of whole numbers that is really a quantity
+(a count, a score, a price in whole units) needs <code>task="regression"</code>:</p>
+<pre><code class="language-python">model = client.training.run(&quot;prices.csv&quot;, task=&quot;regression&quot;, settings={&quot;num_qubits&quot;: 6})
+</code></pre>
+<p><code>task="classification"</code> on a target with fractional numbers stops with an error, as does <code>task="regression"</code> on
+text labels.</p>
+<p>A regression model predicts a number. The circuit encodes the target as a binary number on
+<code>num_qubits_target</code> qubits (default 2, taken from <code>num_qubits</code>); the prediction is the average of that number
+over the measured outcomes, scaled to the range of the training targets, so predictions stay between the
+smallest and largest target seen in training. Its test result is a loss (<code>loss_type</code>, default
+<code>"weighted_hamming"</code>); <code>training.evaluate()</code> and <code>inference.run()</code> also give the mean absolute error, in the
+target's units. Explainable AI works with classification models only.</p>
+<h3 id="clienttrainingstatustrain_id-and-clienttrainingstoptrain_id"><code>client.training.status(train_id)</code> and <code>client.training.stop(train_id)</code></h3>
+<p><code>status()</code> returns <code>train_id</code>, <code>status</code> (<code>running</code>, <code>completed</code>, <code>failed</code> or <code>stopped</code>), <code>progress</code>, <code>summary</code>
+and <code>error_message</code>. A job still waiting in the queue has no status yet (404).</p>
+<p><code>stop()</code> asks the server to stop a running training job; finished layers are kept. Since <code>training.run()</code> waits
+until the job ends, call <code>stop()</code> from another thread, notebook or process. The waiting <code>training.run()</code> then
+raises <code>RuntimeError("Training stopped")</code>.</p>
+<h2 id="evaluating-a-model">Evaluating a Model</h2>
+<p>Training already reports the test accuracy after each layer. The calls in this section look at a trained model
+again, later, in more detail.</p>
+<h3 id="clienttrainingevaluatetrain_id-layernone-settingsnone-verbosefalse-on_progressnone"><code>client.training.evaluate(train_id, layer=None, settings=None, verbose=False, on_progress=None)</code></h3>
+<p>Scores a trained model on the rows held back from its training run. You pass no data: the server rebuilds the
+same split from the model's saved settings.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>train_id</code></td>
+<td>str</td>
+<td>required</td>
+<td>The model, from <code>training.run()</code></td>
+</tr>
+<tr>
+<td><code>layer</code></td>
+<td>int</td>
+<td>highest layer</td>
+<td>Which layer of the model to score</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>dict</td>
+<td><code>None</code></td>
+<td>Execution settings only (<code>backend</code>, <code>parallelize</code>), e.g. to score on a different backend</td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td>bool or <code>"log"</code></td>
+<td><code>False</code></td>
+<td>Print progress to stdout; <code>"log"</code> adds the server's log (<a href="#progress">Progress</a>)</td>
+</tr>
+<tr>
+<td><code>on_progress</code></td>
+<td>callable</td>
+<td><code>None</code></td>
+<td>Called with <code>(percent, message)</code> on each update</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">report = client.training.evaluate(train_id, verbose=True)
+
+print(report[&quot;overall_accuracy&quot;])
+print(report[&quot;test_samples&quot;])
+
+for cls in report[&quot;per_class&quot;]:
+    print(f&quot;Class {cls['class']}: {cls['accuracy']:.1%} ({cls['samples']} samples)&quot;)
+</code></pre>
+<p>Returns a dict with <code>train_id</code>, <code>layer</code>, <code>task</code>, <code>overall_accuracy</code>, <code>overall_loss</code>, <code>test_samples</code>,
+<code>num_classes</code>, <code>per_class</code> (a list of dicts with <code>class</code>, <code>accuracy</code>, <code>loss</code>, <code>samples</code>), and timings. For a
+regression model, <code>overall_accuracy</code> is <code>None</code>, <code>per_class</code> is empty, and <code>mean_absolute_error</code> gives the
+average error in the target's units. It reports on the held-out rows as a whole; for a result per row, use
+<code>inference.run()</code>. At most 400 held-out rows are scored.</p>
+<h3 id="clienttraininganalyzetrain_id-layernone-verbosefalse-on_progressnone"><code>client.training.analyze(train_id, layer=None, verbose=False, on_progress=None)</code></h3>
+<p>Replays the parameters saved during training on the held-out rows, giving the test accuracy and loss over the
+course of training. <code>layer</code> defaults to the highest layer.</p>
+<pre><code class="language-python">replay = client.training.analyze(train_id)
+plt.plot(replay[&quot;accuracy_history&quot;])
+plt.xlabel(&quot;Checkpoint&quot;); plt.ylabel(&quot;Test accuracy&quot;)
+</code></pre>
+<p>Returns a dict with <code>train_id</code>, <code>layer</code>, <code>num_checkpoints</code>, <code>accuracy_history</code>, <code>loss_history</code>,
+<code>final_accuracy</code>, <code>final_loss</code>, and timings. Regression models have a loss history only.</p>
+<h2 id="predictions">Predictions</h2>
+<h3 id="clientinferenceruntrain_id-data-layernone-outputnone-settingsnone-verbosefalse-on_progressnone"><code>client.inference.run(train_id, data, layer=None, output=None, settings=None, verbose=False, on_progress=None)</code></h3>
+<p>Runs a trained model on new rows and returns one result per row.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>train_id</code></td>
+<td>str</td>
+<td>required</td>
+<td>The model, from <code>training.run()</code></td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>str</td>
+<td>required</td>
+<td>A CSV file path, or a dataset ID from <code>datasets.upload()</code></td>
+</tr>
+<tr>
+<td><code>layer</code></td>
+<td>int</td>
+<td>highest layer</td>
+<td>Which layer of the model to use</td>
+</tr>
+<tr>
+<td><code>output</code></td>
+<td>str</td>
+<td><code>None</code></td>
+<td>Also write the results to this CSV file</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>dict</td>
+<td><code>None</code></td>
+<td>Execution settings only (<code>backend</code>, <code>parallelize</code>)</td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td>bool or <code>"log"</code></td>
+<td><code>False</code></td>
+<td>Print progress to stdout; <code>"log"</code> adds the server's log (<a href="#progress">Progress</a>)</td>
+</tr>
+<tr>
+<td><code>on_progress</code></td>
+<td>callable</td>
+<td><code>None</code></td>
+<td>Called with <code>(percent, message)</code> on each update</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">predictions = client.inference.run(train_id, &quot;new_data.csv&quot;, output=&quot;predictions.csv&quot;)
+
+for row in predictions[&quot;predictions&quot;][:5]:
+    print(row[&quot;prediction&quot;], row[&quot;probabilities&quot;])
+</code></pre>
+<p>Returns a dict with <code>train_id</code>, <code>layer</code>, <code>task</code>, <code>rows</code>, timings, and <code>predictions</code>, a list with one entry
+per row, in the order of the file:</p>
+<ul>
+<li><strong>Classification:</strong> <code>{"prediction": "M", "probabilities": {"M": 0.81, "B": 0.19}}</code>. The labels are the ones
+  in the training data.</li>
+<li><strong>Regression:</strong> <code>{"prediction": 152.3}</code>.</li>
+</ul>
+<p>If the new rows also contain the target column, the result has an <code>accuracy</code> as well (regression: a
+<code>mean_absolute_error</code>). The <code>output</code> file holds the input columns plus a <code>prediction</code> column and, for
+classification, one <code>probability_&lt;class&gt;</code> column per class.</p>
+<p>The new rows are prepared exactly as the training data was (scaling, compression, encoding), using the
+training data, which must therefore still be on the server.</p>
+<h3 id="matching-the-columns-of-a-new-file">Matching the Columns of a New File</h3>
+<p>The model has to pair each column of the new file with one of its inputs:</p>
+<ul>
+<li><strong>The file has a header row (a first row that is all text): columns are matched by name.</strong> They can be in
+  any order. Columns the model
+  doesn't use (an ID, say) are ignored. A missing feature column stops with an error naming it. If the target
+  column is present (under its training name), the accuracy is reported too.</li>
+<li><strong>No header row: columns are matched by position.</strong> The columns must be the training features in training
+  order, optionally followed by the target column. Any other number of columns stops with an error saying how
+  many were expected.</li>
+</ul>
+<p>A model trained on a file without a header knows its columns by position only, so its new files are matched by
+position too.</p>
+<h3 id="clientinferencemodels"><code>client.inference.models()</code></h3>
+<p>Lists the six most recently trained models on the server.</p>
+<pre><code class="language-python">for m in client.inference.models()[&quot;models&quot;]:
+    print(m[&quot;train_id&quot;], m.get(&quot;dataset_display_name&quot;), m.get(&quot;num_qubits&quot;), m.get(&quot;layers&quot;))
+</code></pre>
+<p>Each entry includes <code>train_id</code>, <code>dataset</code>, <code>dataset_display_name</code>, <code>num_qubits</code>, <code>layers</code> (the completed layer
+numbers), <code>max_layer</code>, <code>node_order</code>, <code>timestamp</code>, <code>non_defaults</code> (the settings that differ from the defaults)
+and <code>training_params</code>.</p>
+<p>Trained models are not kept forever: see <a href="../known_issues/">Known Issues</a> for how long a server keeps them.</p>
+<h2 id="explainable-ai">Explainable AI</h2>
+<h3 id="clientexplainableruntrain_id-settingsnone-verbosefalse-on_progressnone"><code>client.explainable.run(train_id, settings=None, verbose=False, on_progress=None)</code></h3>
+<p>Shows which input features drive the model's decisions. It uses the highest layer of the model. Each data qubit
+is mapped back to the input feature it encodes, and <code>importance</code> measures how much that qubit influences the
+prediction.</p>
+<p>What a data qubit encodes depends on the <code>dimension_reduction</code> setting. With <code>"dimension_reduction": "none"</code>,
+each data qubit encodes one of your columns, and <code>feature_name</code> is that column's name. By default (<code>"pca"</code>), the
+columns are first combined into principal components, each a mix of all of them: <code>feature_name</code> is the
+component (<code>PC1</code>, <code>PC2</code>, ...), and <code>made_of</code> lists the columns with the largest shares of it, largest first, with
+the rest summed:</p>
+<pre><code class="language-python">{&quot;parts&quot;: [{&quot;feature&quot;: &quot;worst_perimeter&quot;, &quot;share&quot;: 0.49}, {&quot;feature&quot;: &quot;worst_radius&quot;, &quot;share&quot;: 0.23}, ...],
+ &quot;others&quot;: {&quot;count&quot;: 26, &quot;share&quot;: 0.13}}
+</code></pre>
+<p>The shares of all the columns add up to 1. A component with one or two large shares stands mostly for those
+columns; one with many small shares is a broad mix.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>train_id</code></td>
+<td>str</td>
+<td>required</td>
+<td>The model, from <code>training.run()</code></td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>dict</td>
+<td><code>None</code></td>
+<td>Execution settings only (<code>backend</code>, <code>parallelize</code>)</td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td>bool or <code>"log"</code></td>
+<td><code>False</code></td>
+<td>Print progress to stdout; <code>"log"</code> adds the server's log (<a href="#progress">Progress</a>)</td>
+</tr>
+<tr>
+<td><code>on_progress</code></td>
+<td>callable</td>
+<td><code>None</code></td>
+<td>Called with <code>(percent, message)</code> on each update</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">explanation = client.explainable.run(train_id, verbose=True)
+
+for q in explanation[&quot;qubit_map&quot;]:
+    print(f&quot;Qubit {q['qubit']}: {q['feature_name']} (importance {q['importance']:.1%})&quot;)
+
+for qid, val in explanation[&quot;convergence&quot;].items():
+    print(f&quot;Class qubit {qid}: convergence = {val:.4f}&quot;)
+</code></pre>
+<p>Returns a dict with <code>train_id</code>, <code>layer</code>, <code>dataset_name</code>, <code>num_qubits</code>, <code>num_class_qubits</code>, <code>class_range</code>,
+<code>qubit_map</code> (a list of dicts with <code>qubit</code>, <code>feature_index</code>, <code>feature_name</code>, <code>bits</code>, <code>bit</code>, <code>made_of</code>,
+<code>importance</code>),
+<code>convergence</code> (class qubit ID to convergence value), <code>distributions</code>, <code>feature_indices</code>, and timings.</p>
+<h2 id="dataset-analysis">Dataset Analysis</h2>
+<p>Three calls help you understand a dataset before training. All three take a catalog ID or a dataset ID from
+<code>datasets.upload()</code>, plus <code>verbose</code> and <code>on_progress</code>.</p>
+<h3 id="clientanalysispcadataset_id"><code>client.analysis.pca(dataset_id)</code></h3>
+<p>Principal Component Analysis: how many independent dimensions carry real signal in the data.</p>
+<pre><code class="language-python">pca = client.analysis.pca(&quot;wdbc&quot;, verbose=True)
+print(pca[&quot;features&quot;])              # 30
+print(pca[&quot;thresholds&quot;][&quot;90&quot;])      # 7  (components for 90% of the variance)
+</code></pre>
+<p>Returns <code>dataset_name</code>, <code>features</code>, <code>samples</code>, <code>n_components</code>, <code>variance_ratios</code>, <code>cumulative_variance</code>,
+<code>thresholds</code> (percentage to number of components), and timings.</p>
+<h3 id="clientanalysismidataset_id"><code>client.analysis.mi(dataset_id)</code></h3>
+<p>Mutual information. The data is first reduced with PCA, as training does, and each principal component (<code>PC1</code>,
+<code>PC2</code>, ...) is ranked by how strongly it predicts the target.</p>
+<pre><code class="language-python">mi = client.analysis.mi(&quot;wdbc&quot;, verbose=True)
+for f in mi[&quot;ranked_features&quot;][:5]:
+    print(f[&quot;feature_name&quot;], f[&quot;mi_score&quot;])
+</code></pre>
+<p>Returns <code>dataset_name</code>, <code>samples</code>, <code>features</code>, <code>classes</code>, <code>total_mi</code>, <code>ranked_features</code> (with <code>rank</code>,
+<code>feature_index</code>, <code>feature_name</code>, <code>mi_score</code>, <code>mi_percent</code>), <code>cumulative_mi</code>, <code>thresholds</code>, and timings.</p>
+<h3 id="clientanalysisqredataset_id"><code>client.analysis.qre(dataset_id)</code></h3>
+<p>Quantum resource estimation: how many qubits the model needs for this dataset. The data is encoded with more and
+more qubits until no two rows with different classes look the same (so 100% accuracy is possible in principle),
+plus the qubits needed for the class. The result is averaged over 10 random train/test splits.</p>
+<pre><code class="language-python">qre = client.analysis.qre(&quot;wdbc&quot;, verbose=True)
+print(qre[&quot;estimatedQubits&quot;], &quot;+/-&quot;, qre[&quot;standardDeviation&quot;])
+</code></pre>
+<p>Returns <code>dataset_name</code>, <code>estimatedQubits</code>, <code>standardDeviation</code>, <code>samples</code>, <code>features</code>, <code>classes</code>, <code>plotData</code>
+(the highest possible train and test accuracy for each number of data qubits), <code>warning_message</code>, and timings.</p>
+<h2 id="settings">Settings</h2>
+<p>The calls above work with no settings at all. Every part of a model can also be set: the circuit and its
+architecture, how the data is prepared, how training runs, and where the circuits execute.</p>
+<h3 id="passing-settings">Passing Settings</h3>
+<p>Settings are a Python dict, or the path of a <code>.json</code> or <code>.toml</code> file. Only the keys you give change; everything
+else keeps its default. Keys the server doesn't recognize are ignored without an error, so check the spelling
+against the tables below.</p>
+<pre><code class="language-python"># Dict
+client.training.run(&quot;my_data.csv&quot;, settings={&quot;num_qubits&quot;: 8, &quot;seed&quot;: 123})
+
+# JSON file
+client.training.run(&quot;my_data.csv&quot;, settings=&quot;my_settings.json&quot;)
+
+# TOML file (Python 3.11+, or the tomli package)
+client.training.run(&quot;my_data.csv&quot;, settings=&quot;my_settings.toml&quot;)
+</code></pre>
+<p>Every trained model saves its full settings, so any run can be repeated, or used as the starting point for the
+next one.</p>
+<p><code>training.run()</code> takes all settings. <code>training.evaluate()</code>, <code>inference.run()</code> and <code>explainable.run()</code> use the
+model's own settings, fixed when it was trained; their <code>settings=</code> changes only how the circuits are run
+(<code>backend</code>, <code>parallelize</code>).</p>
+<h3 id="circuit-and-architecture">Circuit and Architecture</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>num_qubits</code></td>
+<td>4</td>
+<td>Number of qubits in the circuit</td>
+</tr>
+<tr>
+<td><code>min_layers</code></td>
+<td>1</td>
+<td>First layer in the layer sweep</td>
+</tr>
+<tr>
+<td><code>max_layers</code></td>
+<td>2</td>
+<td>Last layer in the layer sweep</td>
+</tr>
+<tr>
+<td><code>chain_layers</code></td>
+<td><code>True</code></td>
+<td>Start each layer from the parameters the layer before it found (<code>False</code>: each layer starts from scratch)</td>
+</tr>
+<tr>
+<td><code>circuit_structure</code></td>
+<td><code>"bipartite"</code></td>
+<td>How the circuit's nodes are arranged</td>
+</tr>
+<tr>
+<td><code>ansatz_type</code></td>
+<td><code>"euler_and_heisenberg"</code></td>
+<td>Gate ansatz of the parameterized circuit</td>
+</tr>
+<tr>
+<td><code>activation_type</code></td>
+<td><code>"discretize"</code></td>
+<td>Activation function</td>
+</tr>
+<tr>
+<td><code>node_order_type</code></td>
+<td><code>"sequential"</code></td>
+<td>Order in which the optimizer visits the nodes</td>
+</tr>
+<tr>
+<td><code>op_direction</code></td>
+<td><code>"backward"</code></td>
+<td>Order of the ansatz operators over the data qubits (<code>"backward"</code> or <code>"forward"</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-preparation">Data Preparation</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>normalize</code></td>
+<td><code>True</code></td>
+<td>Normalize features to the [0, 1] range</td>
+</tr>
+<tr>
+<td><code>scale</code></td>
+<td><code>True</code></td>
+<td>Scale features before dimension reduction</td>
+</tr>
+<tr>
+<td><code>copula</code></td>
+<td><code>True</code></td>
+<td>Apply a copula transform to the training data</td>
+</tr>
+<tr>
+<td><code>dimension_reduction</code></td>
+<td><code>"pca"</code></td>
+<td>Dimension reduction method (<code>"pca"</code> or <code>"none"</code>)</td>
+</tr>
+<tr>
+<td><code>num_pca</code></td>
+<td>auto</td>
+<td>Number of PCA components</td>
+</tr>
+<tr>
+<td><code>bits_type</code></td>
+<td><code>"importance"</code></td>
+<td>How features are mapped to qubits</td>
+</tr>
+</tbody>
+</table>
+<p>The split into training and test rows is set with the <code>train_size</code>, <code>test_size</code> and <code>class_range</code> arguments of
+<code>training.run()</code>.</p>
+<h3 id="training_1">Training</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>num_iterations</code></td>
+<td>all nodes</td>
+<td>Optimizer iterations per layer</td>
+</tr>
+<tr>
+<td><code>all_nodes</code></td>
+<td><code>False</code></td>
+<td>Optimize all nodes (ignores <code>num_iterations</code>)</td>
+</tr>
+<tr>
+<td><code>batch_size</code></td>
+<td><code>None</code></td>
+<td>Training rows per batch (<code>None</code>: all training rows)</td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td><code>None</code></td>
+<td>Seed for the initial parameters, so runs can be repeated (<code>None</code>: random start)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="regression">Regression</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>num_qubits_target</code></td>
+<td>2</td>
+<td>Qubits that encode the target, out of <code>num_qubits</code></td>
+</tr>
+<tr>
+<td><code>loss_type</code></td>
+<td><code>"weighted_hamming"</code></td>
+<td>Regression loss: <code>"weighted_hamming"</code>, <code>"hamming"</code> or <code>"huber"</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="execution">Execution</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backend</code></td>
+<td><code>"statevector"</code></td>
+<td>Where the circuits run (see below)</td>
+</tr>
+<tr>
+<td><code>parallelize</code></td>
+<td><code>False</code></td>
+<td>Run circuits in parallel</td>
+</tr>
+</tbody>
+</table>
+<h2 id="running-on-quantum-hardware">Running on Quantum Hardware</h2>
+<p>The <code>backend</code> setting chooses where circuits run. <code>"statevector"</code>, the default, is an exact simulator.
+Other backends include <code>"ionq-simulator"</code>, IonQ quantum computers, and IQM quantum computers (<code>"iqm-garnet"</code>,
+<code>"iqm-sirius"</code>, <code>"iqm-emerald"</code>). Which backends a server offers depends on how it is set up and which provider
+accounts it has.</p>
+<p>Hardware time is expensive, and training runs many circuits. A common pattern is to train on a simulator, then
+evaluate the trained model, or make predictions, on hardware:</p>
+<pre><code class="language-python">model = client.training.run(&quot;my_data.csv&quot;, settings={&quot;num_qubits&quot;: 6})
+
+report = client.training.evaluate(model[&quot;train_id&quot;], settings={&quot;backend&quot;: &quot;iqm-garnet&quot;})
+print(report[&quot;overall_accuracy&quot;])
+</code></pre>
+<p>On hardware, results are estimated from shots and carry noise, so they differ somewhat from the exact
+simulator.</p>
+<h2 id="command-line">Command Line</h2>
+<p>Installing the SDK also installs the <code>redcedar</code> command, for training and predictions without writing Python.
+It uses the same server connection (<code>REDCEDAR_URL</code>, <code>REDCEDAR_API_KEY</code>).</p>
+<pre><code class="language-bash">redcedar train my_data.csv --qubits 6 --layers 2 --seed 123
+redcedar evaluate &lt;train_id&gt;
+redcedar predict &lt;train_id&gt; new_data.csv -o predictions.csv
+redcedar models
+redcedar status
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Same as</th>
+<th>Flags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>redcedar train</code></td>
+<td><code>training.run()</code>; prints the test result per layer and the <code>train_id</code></td>
+<td><code>--qubits</code>, <code>--layers N</code> (layers 1 to N), <code>--seed</code>, <code>--backend</code>, <code>--task</code>, <code>--test-size</code>, <code>--settings</code></td>
+</tr>
+<tr>
+<td><code>redcedar evaluate</code></td>
+<td><code>training.evaluate()</code></td>
+<td><code>--layer</code>, <code>--backend</code></td>
+</tr>
+<tr>
+<td><code>redcedar predict</code></td>
+<td><code>inference.run()</code>; prints the predictions, or writes them with <code>-o</code></td>
+<td><code>--layer</code>, <code>--backend</code>, <code>-o</code></td>
+</tr>
+<tr>
+<td><code>redcedar models</code></td>
+<td><code>inference.models()</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>redcedar status</code></td>
+<td><code>status()</code>; prints the server's URL and version and the SDK version</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Any setting can come from a file: <code>--settings my_settings.toml</code>. Before the command, <code>--url</code> and <code>--api-key</code>
+choose the server, <code>--local</code> uses <a href="#local-mode-for-development">local mode</a>, <code>-q</code> turns
+off the progress output, and <code>--log</code> adds the server's log for the job. Run <code>redcedar &lt;command&gt; --help</code> for
+the details.</p>
+<p>If the <code>redcedar</code> command isn't found (pip's scripts folder isn't on your PATH, which is common on Windows and
+with conda), use <code>python -m redcedar</code> instead: <code>python -m redcedar train my_data.csv</code>.</p>
+<h2 id="progress-and-errors">Progress and Errors</h2>
+<h3 id="progress">Progress</h3>
+<p>All long-running calls take <code>verbose</code> and <code>on_progress</code>, which can be used together:</p>
+<ul>
+<li><strong><code>verbose=True</code></strong> prints a single updating line, such as <code>[  30%] Layer 1/2</code>, and the test result after each
+  layer of a training run. While the job is working, a dot is added to the line every few seconds (every 2
+  seconds at first, then every 5, then every 10 on a long step). While the job waits in the queue it prints
+  <code>Waiting in queue...</code>.</li>
+<li><strong><code>verbose="log"</code></strong> prints the same, plus the server's full log for the job (the training output of every
+  iteration, timings, the model's structure). It's meant for finding out what went wrong.</li>
+<li><strong><code>on_progress</code></strong> is called with <code>(percent, message)</code> on each update, for your own progress bars or logging.</li>
+</ul>
+<pre><code class="language-python">def my_callback(percent, message):
+    log.info(f&quot;{percent}% - {message}&quot;)
+
+model = client.training.run(&quot;my_data.csv&quot;, verbose=True, on_progress=my_callback)
+</code></pre>
+<h3 id="errors">Errors</h3>
+<p>The SDK raises standard Python exceptions:</p>
+<ul>
+<li><strong><code>requests.ConnectionError</code></strong>: the server can't be reached. Use <code>client.status()</code> to check before starting
+  work.</li>
+<li><strong><code>requests.HTTPError</code></strong>: the server returned an error, such as 404 for a training job that doesn't exist or
+  401 for a wrong API key.</li>
+<li><strong><code>RuntimeError</code></strong>: a job failed (the server's error message is included), or it was stopped with
+  <code>training.stop()</code> (<code>"Training stopped"</code>).</li>
+</ul>
+<pre><code class="language-python">try:
+    model = client.training.run(&quot;my_data.csv&quot;, verbose=True)
+except RuntimeError as e:
+    print(f&quot;Training failed: {e}&quot;)
+</code></pre>
+<h2 id="limitations">Limitations</h2>
+<p>Some things are not possible yet: explainable AI for regression models, your own data loaders and
+custom circuit components (only CSV files and the catalog, and the built-in components chosen by settings),
+stopping jobs other than training, and keeping models on a server indefinitely. The <a href="../known_issues/">Known Issues</a> page lists these and other known problems.</p>
+<p><br>
+&copy; 2026 Cascade Quantum. All Rights Reserved.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
