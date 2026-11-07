@@ -95,13 +95,13 @@ model = client.training.run("my_data.csv", settings={"num_qubits": 6, "max_layer
 
 The [Settings](user_guide.md#settings) section of the User Guide lists every setting and how to set it.
 
-## Step 2: Infer the Class of New Data
+## Step 2: Infer the Class of Unknown Data
 
-Now use the trained model on new rows whose class is unknown. The new file has the same input columns as the
-training file, without the class column, since the class is what you want to find out:
+Now use the trained model on data whose class is unknown. This file has the same input columns as the training
+file, without the class column, since the class is what you want to find out:
 
 ```python
-results = client.inference.run(model["train_id"], "new_data.csv")
+results = client.inference.run(model["train_id"], "unknown.csv")
 
 for row in results["predictions"][:5]:
     print(row["prediction"], row["probabilities"])
@@ -109,7 +109,7 @@ for row in results["predictions"][:5]:
 
 `inference.run()` returns one result per row: the inferred class, and the probability the model gives each
 class (the probability of the inferred class is the model's confidence). To save the results next to your data,
-add `output="results.csv"`. If the new file does have the class column, the result also includes the accuracy.
+add `output="inferred.csv"`. If the file does have the class column, the result also includes the accuracy.
 
 That's all it takes: a file, a trained model, and the inferred classes.
 
