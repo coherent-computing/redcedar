@@ -1,6 +1,6 @@
 """Red Cedar — Python client for the Red Cedar quantum ML server."""
 
-__version__ = "0.93.0"
+__version__ = "0.94.dev0"
 
 from .client import connect, RedCedarClient
 
