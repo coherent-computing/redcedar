@@ -16,6 +16,8 @@ Version 0.9 is the first tagged version of Red Cedar. Each release below lists t
 - **Delete models in the web app** -- Recent Models has a delete button on each model, with a two-step confirmation.
 - **Public datasets** -- In the web app, a file you upload can be made public: other users then see it under Public Files, with your name, and can train on it. Only you (or a super user) can delete it.
 - **Uploaded files are private** -- A user can use an uploaded file only when it is theirs or public, in every request that takes its ID.
+- **Models are private** -- Evaluation, predictions, training analysis and explainable AI refuse a model that another user trained, as if it didn't exist.
+- **The 20-file limit keeps files that models need** -- When an upload takes a user past 20 files, the oldest is deleted as before, unless a trained model still needs it: a model reads its training file again, so deleting it would break the model.
 - **Admin pages** -- An Admin section in the web app's menu holds Jobs, Users, Uploads and Models. Admins can use Jobs (and now manage the job queue, which needed the super role) and Models, a list of every user's trained models; super users can also manage users, see and delete every user's uploaded files, and delete any model. Job Management shows each job's owner by name, and its tables sort by any column. The sort on the admin pages is remembered.
 - **User Management** -- A Last Active column (who is using the app right now), an invite dialog, and a way to sign out and manage your account on a phone.
 - **Training Settings page** -- Regrouped: the dataset first, the seed among the primary settings, and an Execution section with the backend and parallelization.
