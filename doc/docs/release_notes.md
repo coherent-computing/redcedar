@@ -7,7 +7,7 @@ This section presents a brief record of relevant changes made to each version th
 
 Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.
 
-### Release 0.94 - in preparation
+### Release 0.94 - 11 November 2026
 
 - **Delete uploaded files and models from the SDK** -- `client.datasets.uploads()` lists your uploaded files and `client.datasets.delete_upload(dataset_id)` deletes one. `client.inference.delete_model(train_id)` deletes one of your trained models. A model needs the file it was trained on, so delete the models trained on a file before the file (see [Your Uploaded Files](user_guide.md#your-uploaded-files)).
 - **Your own models only** -- `client.inference.models()`, `redcedar models` and the web app's Recent Models list the models you trained. They listed every user's models before.
