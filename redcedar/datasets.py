@@ -34,6 +34,36 @@ class DatasetManager:
             return self._client._local_call(self._client.core.upload, file_path)
         return self._client._post_file("/upload", file_path)["jobId"]
 
+    def uploads(self):
+        """List your uploaded files, newest first.
+
+        Every CSV file passed to training.run() or inference.run() by path is uploaded
+        and stays on the server until you delete it.
+
+        Returns:
+            List of dicts with id (the dataset ID), name, created_at, file_size, rows,
+            columns, problem (why training can't use the file, or None), task
+            ('classification' or 'regression'), target (the target column's name),
+            classes, and models (the number of trained models that need the file).
+        """
+        if self._client.core:
+            return self._client._local_call(self._client.core.uploads)
+        return self._client._get("/uploads")
+
+    def delete_upload(self, dataset_id):
+        """Delete one of your uploaded files.
+
+        A model trained on the file needs it: evaluation, predictions, training analysis
+        and explainable AI read the training data again. Delete those models first, or
+        keep the file while you use them.
+
+        Args:
+            dataset_id: The file's ID (from upload() or uploads()).
+        """
+        if self._client.core:
+            return self._client._local_call(self._client.core.delete_upload, dataset_id)
+        return self._client._delete(f"/uploads/{dataset_id}")
+
     def _as_id(self, data):
         """A CSV file path is uploaded and replaced by its dataset ID; anything
         else (a catalog ID or an upload ID) is returned as it is."""

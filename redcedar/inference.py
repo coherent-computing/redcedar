@@ -61,7 +61,7 @@ class InferenceManager:
         return result
 
     def models(self):
-        """List available trained models on the server.
+        """List your six most recently trained models.
 
         Returns:
             Dict with 'models' list containing model metadata.
@@ -69,6 +69,19 @@ class InferenceManager:
         if self._client.core:   # local mode: call the core directly
             return self._client.core.models()
         return self._client._get("/inference/models")
+
+    def delete_model(self, train_id):
+        """Delete one of your trained models. A model that is still training can't be
+        deleted: stop it first (training.stop()).
+
+        Args:
+            train_id: Training job ID (from training.run() or models()).
+        """
+        if self._client.core:   # local mode: call the core directly
+            return self._client._local_call(self._client.core.delete_model, train_id)
+        # A server called directly records the SDK's jobs as user "sdk" (see run()); through
+        # a gateway, the gateway puts the API key's user here instead
+        return self._client._delete(f"/inference/models/{train_id}", params={"user_id": "sdk"})
 
 
 def _write_predictions(data_path, predictions, output):

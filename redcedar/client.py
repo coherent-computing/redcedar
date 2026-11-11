@@ -172,6 +172,11 @@ class RedCedarClient:
         _raise_for_status(resp)
         return resp.json()
 
+    def _delete(self, path, params=None):
+        resp = requests.delete(f"{self._server(path)}{path}", headers=self._headers(), params=params)
+        _raise_for_status(resp)
+        return resp.json()
+
     def _post(self, path, body=None):
         resp = requests.post(
             f"{self._server(path)}{path}",

@@ -147,6 +147,30 @@ dataset_id = client.datasets.upload("my_data.csv")
 model = client.training.run(dataset_id, settings={"num_qubits": 6})
 ```
 
+### Your Uploaded Files
+
+Uploaded files stay on the server until you delete them. Each user sees only their own. List them, newest first,
+with `datasets.uploads()`:
+
+```python
+for f in client.datasets.uploads():
+    print(f["id"], f["name"], f["rows"], f["task"], f["target"])
+```
+
+Each entry is a dict: `id` (the dataset ID), `name`, `created_at`, `file_size`, `rows`, `columns`, `problem` (why
+training can't use the file as it is, or `None`), and how training will use it: `task` (`classification` or
+`regression`), `target` (the target column's name, `None` without a header row) and `classes`; and `models`,
+the number of trained models that need the file.
+
+Delete one with `datasets.delete_upload(dataset_id)`. A model needs the file it was trained on: evaluation,
+predictions, training analysis and explainable AI read the training data again. When `models` isn't 0, delete
+those models first (`inference.delete_model()`, under [Predictions](#predictions)), or keep the file while you
+use them.
+
+```python
+client.datasets.delete_upload(dataset_id)
+```
+
 ### The Dataset Catalog
 
 The server also has a catalog of ready-to-use datasets, such as `"wdbc"`, `"iris"` and `"diabetes"`.
@@ -385,7 +409,8 @@ position too.
 
 ### `client.inference.models()`
 
-Lists the six most recently trained models on the server.
+Lists your six most recently trained models. On a hosted server, these are the models trained with your API key
+or your sign-in to the web app; other users' models are not listed.
 
 ```python
 for m in client.inference.models()["models"]:
@@ -397,6 +422,15 @@ numbers), `max_layer`, `node_order`, `timestamp`, `non_defaults` (the settings t
 and `training_params`.
 
 Trained models are not kept forever: see [Known Issues](known_issues.md) for how long a server keeps them.
+
+### `client.inference.delete_model(train_id)`
+
+Deletes one of your trained models: its parameters and settings. A model that is still training can't be
+deleted; stop it first with `training.stop()`.
+
+```python
+client.inference.delete_model(model["train_id"])
+```
 
 ## Explainable AI
 

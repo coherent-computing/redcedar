@@ -7,7 +7,22 @@ This section presents a brief record of relevant changes made to each version th
 
 Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.
 
-### Release 0.93 - in preparation
+### Release 0.94 - in preparation
+
+- **Delete uploaded files and models from the SDK** -- `client.datasets.uploads()` lists your uploaded files and `client.datasets.delete_upload(dataset_id)` deletes one. `client.inference.delete_model(train_id)` deletes one of your trained models. A model needs the file it was trained on, so delete the models trained on a file before the file (see [Your Uploaded Files](user_guide.md#your-uploaded-files)).
+- **Your own models only** -- `client.inference.models()`, `redcedar models` and the web app's Recent Models list the models you trained. They listed every user's models before.
+- **Sample datasets** -- The web app has two kinds of uploaded files: training datasets, with the classes or target values the model learns from, and sample datasets, the rows a trained model classifies or predicts. Inference > Classification and Regression run the active model on a sample dataset whose columns fit it, show the predictions, and download them as a CSV file. Scoring a model on its held-out test rows moved to Model Training > Evaluate.
+- **How a dataset will train** -- After a training dataset is uploaded, the web app shows how it will be trained (for example "Trains as classification of the last column, diagnosis"), in the upload list, and on Run Training. A file whose target is whole numbers is detected as classification, one class per value; a link offers to train it as regression instead.
+- **Delete models in the web app** -- Recent Models has a delete button on each model, with a two-step confirmation.
+- **Public datasets** -- In the web app, a file you upload can be made public: other users then see it under Public Files, with your name, and can train on it. Only you (or a super user) can delete it.
+- **Uploaded files are private** -- A user can use an uploaded file only when it is theirs or public, in every request that takes its ID.
+- **Admin pages** -- An Admin section in the web app's menu holds Jobs, Users, Uploads and Models. Admins can use Jobs (and now manage the job queue, which needed the super role) and Models, a list of every user's trained models; super users can also manage users, see and delete every user's uploaded files, and delete any model. Job Management shows each job's owner by name, and its tables sort by any column. The sort on the admin pages is remembered.
+- **User Management** -- A Last Active column (who is using the app right now), an invite dialog, and a way to sign out and manage your account on a phone.
+- **Training Settings page** -- Regrouped: the dataset first, the seed among the primary settings, and an Execution section with the backend and parallelization.
+- **WDBC with its original labels** -- The catalog's WDBC dataset now has the diagnosis as `M` and `B`, from the original UCI release, instead of OpenML's `1` and `2`. The rows are the same. **Models trained on WDBC with an earlier version predict `1`/`2`: retrain them to get `M`/`B`.**
+- **Bug fix: the queue status shared the running job's owner** -- Every signed-in user's queue status included the running job's ID and its owner's user ID. Only the job's owner gets them now.
+
+### Release 0.93 - 8 November 2026
 
 - **Predictions on new data** -- `client.inference.run(train_id, "new_data.csv")` returns a prediction for each row: the class label and the probability of each class, or a number for a regression model. When the file also has the target column, the result includes the accuracy (classification) or the mean absolute error (regression). Columns are matched by header name, or by position in a file without a header row. `output="predictions.csv"` writes the rows with their predictions.
 - **Evaluation renamed** -- Scoring a model on the test rows held back from its training run is now `client.training.evaluate(train_id)`, and `client.inference.run()` makes predictions on new data. Code that called `inference.run(train_id)` for the test accuracy must change to `training.evaluate(train_id)`. The example notebooks are updated.
