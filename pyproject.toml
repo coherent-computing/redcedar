@@ -10,7 +10,19 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
 authors = [{name = "Cascade Quantum"}]
-keywords = ["quantum computing", "quantum machine learning", "machine learning", "explainable ai", "client", "sdk"]
+keywords = ["red cedar", "redcedar", "cascade quantum", "quantum", "quantum computing", "quantum machine learning", "qml", "machine learning", "classification", "explainable ai", "client", "sdk"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 dependencies = [
     "requests>=2.28",

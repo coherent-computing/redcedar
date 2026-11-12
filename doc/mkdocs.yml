@@ -1,5 +1,7 @@
 site_name: Red Cedar
 site_url: https://coherent-computing.github.io/redcedar/
+site_description: Documentation for redcedar, the Python SDK for Red Cedar, the quantum machine learning framework from Cascade Quantum. Install it with pip install redcedar.
+site_author: Cascade Quantum
 
 theme: mkdocs
 
