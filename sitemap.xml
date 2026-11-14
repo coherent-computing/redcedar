@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/about/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/examples/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/known_issues/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/quick_start/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/release_notes/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+    <url>
+         <loc>https://coherent-computing.github.io/redcedar/user_guide/</loc>
+         <lastmod>2026-11-14</lastmod>
+    </url>
+</urlset>
