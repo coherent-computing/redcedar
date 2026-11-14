@@ -21,8 +21,6 @@ This section presents a brief record of relevant changes made to each version th
 
 - **Trained models are kept** -- The server deleted every model older than 24 hours, and all but the newest 30, each time it started, so a restart or an update removed older models. Now each signed-in user keeps their 20 newest models: when a training takes a user past 20, their oldest are deleted (see [Known Issues](known_issues.md)).
 
-- **Bug fix: Explainable AI failed with an error 500** -- Right after a server restart, a request could fail with a bare "500 Internal Server Error" when the job database was busy. The server now waits up to 30 seconds for it, and a database error answers with its message ("database is locked" as a 503), so a client can retry.
-
 - **All your models are listed** -- `client.inference.models()`, `redcedar models` and the web app's Recent Models showed only your six newest models. They now list all of them, newest first (a server keeps each user's 20 newest models); `models(limit=N)` lists fewer. Models trained within the same minute were not always listed newest first; they are now.
 
 - **Prediction files are stored as sample datasets** -- A CSV file passed by path to `inference.run()` or `redcedar predict` was stored as a training dataset, with a new copy on every call. It is now stored as a sample dataset, and a sample file identical to one you already uploaded (same name and contents) is not stored again: the earlier one is used, also in the web app. Training files are stored each time, as before. `datasets.upload()` and `datasets.uploads()` take `kind="samples"` (see [Your Uploaded Files](user_guide.md#your-uploaded-files)).
