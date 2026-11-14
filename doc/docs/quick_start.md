@@ -121,11 +121,11 @@ Red Cedar can show which of your input features the model relies on to make its 
 ```python
 explanation = client.explainable.run(model["train_id"], verbose=True)
 
-for q in explanation["qubit_map"]:
-    print(f"{q['feature_name']}: {q['importance']:.1%}")
+for f in explanation["feature_importances"]:   # most important first
+    print(f"{f['feature_name']}: {f['importance']:.1%}")
 ```
 
-Each data qubit of the model encodes one input feature, and `importance` measures how much that qubit influences
+The model's data qubits encode the input features, and `importance` measures how much each feature influences
 the prediction. By default Red Cedar first combines your columns into new features (principal components); train
 with `settings={"dimension_reduction": "none"}` to keep your own columns, so that the results name them. See
 [Explainable AI](user_guide.md#explainable-ai) in the User Guide.

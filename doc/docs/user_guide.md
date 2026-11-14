@@ -448,8 +448,8 @@ client.inference.delete_model(model["train_id"])
 ### `client.explainable.run(train_id, settings=None, verbose=False, on_progress=None)`
 
 Shows which input features drive the model's decisions. It uses the highest layer of the model. Each data qubit
-is mapped back to the input feature it encodes, and `importance` measures how much that qubit influences the
-prediction.
+is mapped back to the input feature it encodes, and `importance` measures how much the feature influences the
+prediction: the probability that its qubit (or, for a feature on several qubits, any of them) reads 1.
 
 What a data qubit encodes depends on the `dimension_reduction` setting. With `"dimension_reduction": "none"`,
 each data qubit encodes one of your columns, and `feature_name` is that column's name. By default (`"pca"`), the
@@ -475,8 +475,8 @@ columns; one with many small shares is a broad mix.
 ```python
 explanation = client.explainable.run(train_id, verbose=True)
 
-for q in explanation["qubit_map"]:
-    print(f"Qubit {q['qubit']}: {q['feature_name']} (importance {q['importance']:.1%})")
+for f in explanation["feature_importances"]:          # one per feature, most important first
+    print(f"{f['feature_name']}: importance {f['importance']:.1%}")
 
 for qid, val in explanation["convergence"].items():
     print(f"Class qubit {qid}: convergence = {val:.4f}")

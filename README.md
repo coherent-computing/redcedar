@@ -31,8 +31,8 @@ predictions = client.inference.run(train_id, "new_data.csv", output="predictions
 
 # Which input features drive the model
 explanation = client.explainable.run(train_id)
-for q in explanation['qubit_map']:
-    print(f"{q['feature_name']}: {q['importance']*100:.1f}%")
+for f in explanation['feature_importances']:
+    print(f"{f['feature_name']}: {f['importance']*100:.1f}%")
 ```
 
 `REDCEDAR_URL` and `REDCEDAR_API_KEY` can be set in the environment instead, and then `redcedar.connect()` needs no arguments.

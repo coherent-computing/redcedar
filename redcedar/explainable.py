@@ -20,8 +20,10 @@ class ExplainableManager:
             settings: Optional dict of runtime overrides (e.g. backend, parallelize).
 
         Returns:
-            Dict with qubit_map (feature importance per qubit),
-            distributions, convergence values, feature_indices, etc.
+            Dict with feature_importances (one per feature, most important first;
+            for a random forest, its importance per column), qubit_map (the
+            quantum model's importance per data qubit), distributions,
+            convergence values, feature_indices, etc.
         """
         if self._client.core:   # local mode: call the core directly
             return self._client._run_local(self._client.core.explain, train_id, settings=settings,
