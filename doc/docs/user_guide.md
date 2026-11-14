@@ -718,22 +718,81 @@ It uses the same server connection (`REDCEDAR_URL`, `REDCEDAR_API_KEY`).
 redcedar train my_data.csv --qubits 6 --layers 2 --seed 123
 redcedar evaluate <train_id>
 redcedar predict <train_id> new_data.csv -o predictions.csv
+redcedar explain <train_id>
 redcedar models
 redcedar status
 ```
 
 | Command | Same as | Flags |
 |---------|---------|-------|
-| `redcedar train` | `training.run()`; prints the test result per layer and the `train_id` | `--qubits`, `--layers N` (layers 1 to N), `--seed`, `--backend`, `--task`, `--test-size`, `--settings` |
+| `redcedar train` | `training.run()`; prints the test results and the `train_id` | `--settings`, `--set`, `--model`, `--trees`, `--qubits`, `--layers`, `--min-layers`, `--nodes`, `--batch-size`, `--parallelize`, `--seed`, `--backend`, `--task`, `--test-size`, `--save` |
 | `redcedar evaluate` | `training.evaluate()` | `--layer`, `--backend` |
 | `redcedar predict` | `inference.run()`; prints the predictions, or writes them with `-o` | `--layer`, `--backend`, `-o` |
+| `redcedar explain` | `explainable.run()`; prints the features the model relies on, most important first | `--top` (default 10), `--backend` |
 | `redcedar models` | `inference.models()` | |
 | `redcedar status` | `status()`; prints the server's URL and version and the SDK version | |
 
-Any setting can come from a file: `--settings my_settings.toml`. Before the command, `--url` and `--api-key`
-choose the server, `--local` uses [local mode](#local-mode-for-development), `-q` turns
-off the progress output, and `--log` adds the server's log for the job. Run `redcedar <command> --help` for
-the details.
+Before the command, `--url` and `--api-key` choose the server, `--local` uses
+[local mode](#local-mode-for-development) (the Red Cedar code in this process, no server), `-q` turns off the
+progress output, and `--log` adds the server's log for the job. Run `redcedar <command> --help` for the
+details.
+
+### Settings on the Command Line
+
+`redcedar train` takes settings from three places, each over the one before (and all over the server's
+defaults):
+
+1. `--settings FILE`: a `.json` or `.toml` file of settings, as in [Passing Settings](#passing-settings). It
+   holds settings only, not the data, so one file can be used with any data file.
+2. `--set KEY=VALUE`, repeatable: any setting. Values are read as JSON when they can be (`8`, `0.5`, `true`,
+   `null`), otherwise as text. A dotted key sets a value inside a group:
+   `--set forest_options.n_estimators=500`.
+3. The named flags:
+
+| Flag | Setting |
+|------|---------|
+| `--model quantum` or `random_forest` | `model` (default: the quantum model) |
+| `--trees N` | `forest_options.n_estimators` (random forest) |
+| `--qubits N` | `num_qubits` |
+| `--layers N` | `max_layers` (from layer 1, unless `--min-layers`) |
+| `--min-layers N` | `min_layers` |
+| `--nodes N` or `all` | nodes optimized per layer: `num_iterations`, or `all_nodes` |
+| `--batch-size N` | `batch_size` (default: all training rows) |
+| `--parallelize` | `parallelize` |
+| `--seed N` | `seed` |
+| `--backend NAME` | `backend` |
+| `--task`, `--test-size` | as in `training.run()` |
+
+`--save DIR` also writes the result to `DIR/<train_id>.json`: the data file and the settings sent, the
+training curves and the test results per layer. The model itself is kept by the server with its full
+settings, for `evaluate`, `predict` and `explain`.
+
+```bash
+redcedar train my_data.csv --settings my_settings.toml --set num_pca=8 --nodes all --save results
+redcedar train my_data.csv --model random_forest --trees 500 --set forest_options.min_samples_leaf=3
+redcedar train prices.csv --task regression --qubits 6 --seed 7
+```
+
+### Moving from run_qml_workflow.py
+
+Developers who trained with `run_qml_workflow.py` (classification) or the regression workflow's runner, editing
+`settings.py`, can do the same with `redcedar train`, with or without a server (`--local`):
+
+| run_qml_workflow.py | redcedar train |
+|---------------------|----------------|
+| `dataset_name` in `settings.py` | the data argument: a CSV file or a catalog ID |
+| the other values in `settings.py` | a settings file (`--settings`), and `--set` for single values |
+| `--num-qubits N` / `-n N` | `--qubits N` |
+| `--min-layers`, `--max-layers` | `--min-layers`, `--layers` |
+| `--num-iterations N` | `--nodes N` |
+| `--batch-size N` / `-bat N` | `--batch-size N` |
+| `--no-parallel` | the default; `--parallelize` turns it on |
+| `--backend` | `--backend` |
+| the regression workflow | `--task regression` |
+| results under `results/` | the model is kept by the server; `--save DIR` writes the results to a folder |
+
+The command line's defaults are the server's (for example 4 qubits and all nodes per layer), which differ from
+those in the workflows' `settings.py`; put the values you rely on in your settings file.
 
 If the `redcedar` command isn't found (pip's scripts folder isn't on your PATH, which is common on Windows and
 with conda), use `python -m redcedar` instead: `python -m redcedar train my_data.csv`.
