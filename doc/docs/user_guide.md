@@ -615,6 +615,22 @@ client.training.run("my_data.csv", settings="my_settings.json")
 client.training.run("my_data.csv", settings="my_settings.toml")
 ```
 
+The same settings choose and configure a [random forest](#random-forest): `"model": "random_forest"`, and its
+own settings in `forest_options`. The quantum model's settings are ignored for a forest; `seed`, the train and
+test split and `task` apply to both. For example, a `forest.json` file:
+
+```json
+{
+  "model": "random_forest",
+  "seed": 7,
+  "forest_options": {"n_estimators": 500, "min_samples_leaf": 3}
+}
+```
+
+```python
+client.training.run("my_data.csv", settings="forest.json")
+```
+
 Every trained model saves its full settings, so any run can be repeated, or used as the starting point for the
 next one.
 
