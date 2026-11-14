@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - 'doc/**'
+      - 'pyproject.toml'   # the docs show the version set there
   workflow_dispatch:
 
 permissions:

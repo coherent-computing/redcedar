@@ -8,6 +8,10 @@ theme: mkdocs
 extra_css:
     - css/custom.css
 
+# The SDK version from pyproject.toml, in every page's footer and the About page
+hooks:
+    - hooks/version.py
+
 nav:
     - Home: index.md
     - Quick Start: quick_start.md
