@@ -9,6 +9,9 @@ Version 0.9 is the first tagged version of Red Cedar. Each release below lists t
 
 ### Release 0.95 - not released yet
 
+- **Bug fix: N bits per feature** -- `bits_type` `"1"`, `"2"` or `"3"` (the web app's "N bits per feature") stopped training with "num_bits should be sum of pca_bits" unless the number of features times N happened to equal the data qubits. It now takes as many of the most important features as the data qubits hold; the last one gets the qubits left over.
+- **Bug fix: local mode with a new job database** -- The first upload in [local mode](user_guide.md#local-mode-for-development) failed with "no such table: jobs" when the job database was new.
+
 - **Explainable AI: one importance per feature** -- When a feature is encoded on several data qubits, explainable AI gave one importance per qubit only. It now also returns `feature_importances`, one per feature: the probability that any of the feature's qubits reads 1 (for a one-qubit feature, the same as before), with each qubit's own importance. `redcedar explain` shows it (see [Explainable AI](user_guide.md#explainable-ai)).
 
 - **Command line** -- `redcedar train` takes any setting with `--set KEY=VALUE` (dotted keys for groups, such as `forest_options.n_estimators`), over a settings file, and has new flags: `--model`, `--trees`, `--min-layers`, `--nodes`, `--batch-size`, `--parallelize`, and `--save DIR` to write the result to a folder. A new `redcedar explain` command shows the features a model relies on. The User Guide shows how to move from `run_qml_workflow.py` (see [Command Line](user_guide.md#command-line)).
