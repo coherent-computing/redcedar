@@ -476,6 +476,66 @@ Returns a dict with `train_id`, `layer`, `dataset_name`, `num_qubits`, `num_clas
 `importance`),
 `convergence` (class qubit ID to convergence value), `distributions`, `feature_indices`, and timings.
 
+## Random Forest
+
+A random forest is a classical model: many decision trees, each trained on a random draw of the rows, that vote
+on each prediction. Red Cedar trains one as the baseline to compare the quantum model with. It is trained and
+used with the same calls as the quantum model; one setting chooses it:
+
+```python
+forest = client.training.run("my_data.csv", settings={"model": "random_forest", "seed": 123})
+print(f"Test accuracy: {forest['test_accuracy']:.1%}")
+
+predictions = client.inference.run(forest["train_id"], "new_rows.csv")
+importances = client.explainable.run(forest["train_id"])
+```
+
+**Same rows as the quantum model.** For the same file, `train_size` and `test_size`, the forest trains on the
+same rows as the quantum model and is tested on the same held-out rows (the split doesn't depend on the seed),
+so the two test results can be compared directly. Unlike the quantum model, the forest uses your columns as they
+are: no scaling, PCA, feature selection or bits. `test_size=0` trains on every row, as for the quantum model.
+
+**Settings.** The forest's own settings go in `forest_options`; the dataset, split, `task` and `seed` are the
+same settings as for the quantum model, and the quantum model's settings are ignored.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `n_estimators` | `300` | Number of trees, 1 to 2000. More trees give steadier results and take longer |
+| `min_samples_leaf` | `5` | Fewest training rows at the end of a branch; larger keeps the trees simpler |
+| `max_depth` | `None` | Most levels a tree may have (`None`: no limit) |
+| `max_features` | usual for the task | Features each branch point chooses from: `"sqrt"` (the default for classification), `"log2"` or `"all"` (the default for regression) |
+| `class_weight` | `None` | `"balanced"` gives rare classes more weight (classification only) |
+| `seed` | random | Fixes which rows and features each tree draws, so a run can be repeated. Without one, the server picks a seed and saves it with the model |
+
+```python
+settings = {"model": "random_forest", "seed": 7,
+            "forest_options": {"n_estimators": 500, "min_samples_leaf": 3}}
+forest = client.training.run("my_data.csv", settings=settings)
+```
+
+A value the forest can't use (for example 2001 trees, or an unknown setting) stops with a 400 error naming it.
+
+**Results.** `training.run()` returns `train_id`, `model` (`"random_forest"`), `task`, `train_samples`,
+`test_samples`, `num_features`, `fit_seconds`, `elapsed_seconds`, `train_accuracy` (classification), and, when
+there is a test set, `test_accuracy` and `per_class` (classification) or `mean_absolute_error` and `r2`
+(regression). `history` and `validation` are empty: a forest is fitted in one step, with no training curve or
+layers.
+
+- `training.evaluate(train_id)` scores the held-out rows: `overall_accuracy` and `per_class`, or
+  `mean_absolute_error` and `r2` for regression. The loss fields are `None`: a forest has no loss comparable
+  with the quantum model's.
+- `inference.run(train_id, data)` returns the same fields as for the quantum model. A class's probability is
+  the share of trees that voted for it.
+- `explainable.run(train_id)` returns `feature_importances`, a list of `{feature_name, importance}`, largest
+  first. The importances add up to 1: each is the share of the trees' error reduction that comes from that
+  column.
+- `training.analyze(train_id)` stops with an error: there is no training to replay.
+- `layer=` is ignored, and `inference.models()` shows `"model": "random_forest"` for a forest.
+
+**Running beside quantum jobs.** A forest job doesn't wait for a quantum training to finish: the server runs one
+forest job and one quantum job at a time, side by side. Forest models count toward the same per-user model
+limit as quantum models.
+
 ## Dataset Analysis
 
 Three calls help you understand a dataset before training. All three take a catalog ID or a dataset ID from

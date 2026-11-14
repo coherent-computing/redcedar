@@ -7,6 +7,10 @@ This section presents a brief record of relevant changes made to each version th
 
 Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.
 
+### Release 0.95 - not released yet
+
+- **Random forest baseline** -- `settings={"model": "random_forest"}` trains a random forest, a classical model, instead of the quantum model, on the same training rows, and tests it on the same held-out rows, so the two results can be compared directly. Evaluation, predictions and explainable AI (feature importances) work on it with the same calls. Its settings go in `forest_options` (number of trees up to 2000, minimum rows per leaf, depth, features per split, class weight). Forest jobs run beside quantum jobs instead of waiting for them. In the web app, Training Settings has Quantum and Random Forest tabs; the tab shown is the model Run Training trains (see [Random Forest](user_guide.md#random-forest)). Two new example notebooks: `06_random_forest.ipynb` (the Quick Start's steps with a forest) and `07_quantum_and_forest.ipynb` (both models side by side), and the script `quantum_and_forest.py`.
+
 ### Release 0.94 - 11 November 2026
 
 - **Delete uploaded files and models from the SDK** -- `client.datasets.uploads()` lists your uploaded files and `client.datasets.delete_upload(dataset_id)` deletes one. `client.inference.delete_model(train_id)` deletes one of your trained models. A model needs the file it was trained on, so delete the models trained on a file before the file (see [Your Uploaded Files](user_guide.md#your-uploaded-files)).

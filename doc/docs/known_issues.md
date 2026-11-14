@@ -22,7 +22,7 @@ These are fundamental limitations in the current implementation. Some may be rel
 
 - **Only training can be stopped.** Inference, explainable AI and the training replay run to completion once they start.
 
-- **Saved models are deleted after 24 hours.** Each time the server starts, it deletes trained models older than 24 hours, and all but the 30 most recent. A model you trained yesterday may be gone after a restart. Size-based cleanup is planned to replace this. **Workaround**: to keep a model, copy its folder from `server/training_results/`.
+- **Each user keeps their 20 most recent models.** When a training takes a signed-in user past 20 trained models, their oldest models are deleted. Models trained with no user (a local server, or the backend key) are not limited, and a restart doesn't delete models. **Workaround**: to keep an older model, copy its folder from `server/training_results/`.
 
 - **A restart drops jobs that were running.** When the server starts, it removes jobs that were running when it stopped. They are not restarted; submit them again. Queued jobs are kept.
 
