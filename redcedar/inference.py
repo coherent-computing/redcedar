@@ -20,7 +20,8 @@ class InferenceManager:
 
         Args:
             train_id: Training job ID (from training.run() result).
-            data: A CSV file path (uploaded first), or an ID from datasets.upload().
+            data: A CSV file path (uploaded first, as a samples file), or an ID
+                  from datasets.upload().
             layer: Optional layer number to use (default: highest layer).
             output: Optional CSV file path to write the input rows plus the
                     predictions to.
@@ -36,7 +37,7 @@ class InferenceManager:
             when the target column is present.
         """
         data_path = os.fspath(data) if output and isinstance(data, (str, os.PathLike)) else None
-        data_id = self._client.datasets._as_id(data)
+        data_id = self._client.datasets._as_id(data, kind="samples")
         if self._client.core:   # local mode: call the core directly
             result = self._client._run_local(self._client.core.predict, train_id, data_id,
                                              layer=layer, settings=settings,
@@ -60,15 +61,18 @@ class InferenceManager:
             _write_predictions(data_path, result["predictions"], output)
         return result
 
-    def models(self):
-        """List your six most recently trained models.
+    def models(self, limit=None):
+        """List your trained models, newest first (the server keeps your 20 newest).
+
+        Args:
+            limit: At most this many; None (the default) lists all of them.
 
         Returns:
             Dict with 'models' list containing model metadata.
         """
         if self._client.core:   # local mode: call the core directly
-            return self._client.core.models()
-        return self._client._get("/inference/models")
+            return self._client.core.models(limit=limit)
+        return self._client._get(f"/inference/models?limit={limit or 0}")
 
     def delete_model(self, train_id):
         """Delete one of your trained models. A model that is still training can't be

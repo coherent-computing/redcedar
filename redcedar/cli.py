@@ -21,6 +21,7 @@ file can be used for any data.
 import argparse
 import json
 import os
+import re
 import sys
 
 import requests
@@ -121,6 +122,14 @@ def save_training(folder, data, settings, result):
     return path
 
 
+def dataset_label(dataset):
+    """A model's dataset as a file name: an uploaded file's server path without its folder
+    and the upload ID in front of the name (as the web app shows it)."""
+    name = re.split(r"[\\/]", str(dataset or ""))[-1]
+    return re.sub(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_", "", name,
+                  flags=re.IGNORECASE)
+
+
 def print_explanation(result, top):
     """The features a model relies on, most important first."""
     if result.get("model") == "random_forest":   # one importance per column
@@ -206,7 +215,7 @@ def main(argv=None):
     x.add_argument("--top", type=int, default=10, help="how many features to show (default: 10)")
     x.add_argument("--backend")
 
-    sub.add_parser("models", help="list recently trained models")
+    sub.add_parser("models", help="list your trained models, newest first")
     sub.add_parser("status", help="check the server and show the server and SDK versions")
 
     args = p.parse_args(argv)
@@ -263,7 +272,7 @@ def main(argv=None):
             for m in client.inference.models()["models"]:
                 kind = ("random forest" if m.get("model") == "random_forest"
                         else f"{m.get('num_qubits')} qubits, layers {m.get('layers')}")
-                print(m["train_id"], m.get("dataset_display_name") or m.get("dataset", ""),
+                print(m["train_id"], dataset_label(m.get("dataset_display_name") or m.get("dataset", "")),
                       m.get("task", ""), kind)
 
         elif args.command == "status":

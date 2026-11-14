@@ -173,6 +173,12 @@ training can't use the file as it is, or `None`), and how training will use it: 
 `regression`), `target` (the target column's name, `None` without a header row) and `classes`; and `models`,
 the number of trained models that need the file.
 
+There are two kinds of uploaded files: training datasets, and sample datasets, the rows a trained model
+classifies or predicts. A file passed to `inference.run()` by path is uploaded as a sample dataset, and a
+sample file identical to one you already uploaded (same name and contents) is not stored again: the earlier
+one is used. `datasets.uploads(kind="samples")` lists them, and `datasets.upload(path, kind="samples")`
+uploads one.
+
 Delete one with `datasets.delete_upload(dataset_id)`. A model needs the file it was trained on: evaluation,
 predictions, training analysis and explainable AI read the training data again. When `models` isn't 0, delete
 those models first (`inference.delete_model()`, under [Predictions](#predictions)), or keep the file while you
@@ -375,7 +381,7 @@ Runs a trained model on new rows and returns one result per row.
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
 | `train_id` | str | required | The model, from `training.run()` |
-| `data` | str | required | A CSV file path, or a dataset ID from `datasets.upload()` |
+| `data` | str | required | A CSV file path (uploaded as a sample dataset), or a dataset ID from `datasets.upload()` |
 | `layer` | int | highest layer | Which layer of the model to use |
 | `output` | str | `None` | Also write the results to this CSV file |
 | `settings` | dict | `None` | Execution settings only (`backend`, `parallelize`) |
@@ -418,10 +424,10 @@ The model has to pair each column of the new file with one of its inputs:
 A model trained on a file without a header knows its columns by position only, so its new files are matched by
 position too.
 
-### `client.inference.models()`
+### `client.inference.models(limit=None)`
 
-Lists your six most recently trained models. On a hosted server, these are the models trained with your API key
-or your sign-in to the web app; other users' models are not listed.
+Lists your trained models, newest first; `limit` lists only that many. On a hosted server, these are the models
+trained with your API key or your sign-in to the web app; other users' models are not listed.
 
 ```python
 for m in client.inference.models()["models"]:

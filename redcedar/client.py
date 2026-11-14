@@ -186,7 +186,7 @@ class RedCedarClient:
         _raise_for_status(resp)
         return resp.json()
 
-    def _post_file(self, path, file_path):
+    def _post_file(self, path, file_path, params=None):
         """Upload a file as multipart form data (field name 'file')."""
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         with open(file_path, "rb") as f:
@@ -194,6 +194,7 @@ class RedCedarClient:
                 f"{self._server(path)}{path}",
                 headers=headers,
                 files={"file": (os.path.basename(file_path), f)},
+                params=params,
             )
         _raise_for_status(resp)
         return resp.json()
