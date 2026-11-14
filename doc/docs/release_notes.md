@@ -9,7 +9,7 @@ This section presents a brief record of relevant changes made to each version th
 
 - **Explainable AI: one importance per feature** -- When a feature is encoded on several data qubits, explainable AI gave one importance per qubit only. It now also returns `feature_importances`, one per feature: the probability that any of the feature's qubits reads 1 (for a one-qubit feature, the same as before), with each qubit's own importance. `redcedar explain` shows it (see [Explainable AI](user_guide.md#explainable-ai)).
 
-- **Columns that are not features are left out** -- Text columns (such as a patient name) and ID columns (named like an ID, or row numbers at the start of a file without a header) are no longer used as features, and training reports them. A text column used to stop training with an error, and a numbered ID was used as a feature, which can make the test accuracy look better than it is. Prediction files may have these columns or not (see [Your Own Data](user_guide.md#your-own-data)).
+- **Columns that are not features are left out** -- Text columns (such as a patient name) and ID columns (named like an ID, or row numbers at the start of a file without a header) are no longer used as features, and training reports them. A text column used to stop training with an error, and a numbered ID was used as a feature, which can make the test accuracy look better than it is. Prediction files may have these columns or not (see [Your Own Data](user_guide.md#your-own-data)). Models trained with an earlier version still read their files with every column, so their results don't change.
 
 - **Bug fix: N bits per feature** -- `bits_type` `"1"`, `"2"` or `"3"` (the web app's "N bits per feature") stopped training with "num_bits should be sum of pca_bits" unless the number of features times N happened to equal the data qubits. It now takes as many of the most important features as the data qubits hold; the last one gets the qubits left over.
 
@@ -18,6 +18,10 @@ This section presents a brief record of relevant changes made to each version th
 - **Command line** -- `redcedar train` takes any setting with `--set KEY=VALUE` (dotted keys for groups, such as `forest_options.n_estimators`), over a settings file, and has new flags: `--model`, `--trees`, `--min-layers`, `--nodes`, `--batch-size`, `--parallelize`, and `--save DIR` to write the result to a folder. A new `redcedar explain` command shows the features a model relies on. The User Guide shows how to move from `run_qml_workflow.py` (see [Command Line](user_guide.md#command-line)).
 
 - **Bug fix: queued jobs in the web app showed no results** -- When Explainable AI, Evaluate, Classification, Regression or Training Analysis had to wait in the queue and then ran quickly, the page went back to "Idle" without showing the results. The page now shows them.
+
+- **Trained models are kept** -- The server deleted every model older than 24 hours, and all but the newest 30, each time it started, so a restart or an update removed older models. Now each signed-in user keeps their 20 newest models: when a training takes a user past 20, their oldest are deleted (see [Known Issues](known_issues.md)).
+
+- **Bug fix: Explainable AI failed with an error 500** -- Right after a server restart, a request could fail with a bare "500 Internal Server Error" when the job database was busy. The server now waits up to 30 seconds for it, and a database error answers with its message ("database is locked" as a 503), so a client can retry.
 
 - **All your models are listed** -- `client.inference.models()`, `redcedar models` and the web app's Recent Models showed only your six newest models. They now list all of them, newest first (a server keeps each user's 20 newest models); `models(limit=N)` lists fewer. Models trained within the same minute were not always listed newest first; they are now.
 
