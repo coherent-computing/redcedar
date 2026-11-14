@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Cascade Quantum">
+        <link rel="canonical" href="https://coherent-computing.github.io/redcedar/release_notes/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Releases - Red Cedar</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../css/custom.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Red Cedar</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../quick_start/" class="nav-link">Quick Start</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../user_guide/" class="nav-link">User Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">Releases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../known_issues/" class="nav-link">PAL</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../examples/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../known_issues/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#release-notes" class="nav-link">Release Notes</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#version-20-release-notes" class="nav-link">Version 2.0 Release Notes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#version-09-release-notes" class="nav-link">Version 0.9 Release Notes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="release-notes">Release Notes</h1>
+<p><strong>Red Cedar</strong> is continually evolving, with issues fixed and enhancements made to add features.
+This section presents a brief record of relevant changes made to each version that has been released. Latest version is at the top.</p>
+<h2 id="version-20-release-notes">Version 2.0 Release Notes</h2>
+<h3 id="release-20-14-november-2026">Release 2.0 - 14 November 2026</h3>
+<ul>
+<li>
+<p><strong>Bug fix: queued jobs in the web app showed no results</strong> -- When Explainable AI, Evaluate, Classification, Regression or Training Analysis had to wait in the queue and then ran quickly, the page went back to "Idle" without showing the results. The page now shows them.</p>
+</li>
+<li>
+<p><strong>Bug fix: N bits per feature</strong> -- <code>bits_type</code> <code>"1"</code>, <code>"2"</code> or <code>"3"</code> (the web app's "N bits per feature") stopped training with "num_bits should be sum of pca_bits" unless the number of features times N happened to equal the data qubits. It now takes as many of the most important features as the data qubits hold; the last one gets the qubits left over.</p>
+</li>
+<li>
+<p><strong>Bug fix: local mode with a new job database</strong> -- The first upload in <a href="../user_guide/#local-mode-for-development">local mode</a> failed with "no such table: jobs" when the job database was new.</p>
+</li>
+<li>
+<p><strong>Explainable AI: one importance per feature</strong> -- When a feature is encoded on several data qubits, explainable AI gave one importance per qubit only. It now also returns <code>feature_importances</code>, one per feature: the probability that any of the feature's qubits reads 1 (for a one-qubit feature, the same as before), with each qubit's own importance. <code>redcedar explain</code> shows it (see <a href="../user_guide/#explainable-ai">Explainable AI</a>).</p>
+</li>
+<li>
+<p><strong>Command line</strong> -- <code>redcedar train</code> takes any setting with <code>--set KEY=VALUE</code> (dotted keys for groups, such as <code>forest_options.n_estimators</code>), over a settings file, and has new flags: <code>--model</code>, <code>--trees</code>, <code>--min-layers</code>, <code>--nodes</code>, <code>--batch-size</code>, <code>--parallelize</code>, and <code>--save DIR</code> to write the result to a folder. A new <code>redcedar explain</code> command shows the features a model relies on. The User Guide shows how to move from <code>run_qml_workflow.py</code> (see <a href="../user_guide/#command-line">Command Line</a>).</p>
+</li>
+<li>
+<p><strong>Columns that are not features are left out</strong> -- Text columns (such as a patient name) and ID columns (named like an ID, or row numbers at the start of a file without a header) are no longer used as features, and training reports them. A text column used to stop training with an error, and a numbered ID was used as a feature, which can make the test accuracy look better than it is. Prediction files may have these columns or not (see <a href="../user_guide/#your-own-data">Your Own Data</a>).</p>
+</li>
+<li>
+<p><strong>Random forest baseline</strong> -- <code>settings={"model": "random_forest"}</code> trains a random forest, a classical model, instead of the quantum model, on the same training rows, and tests it on the same held-out rows, so the two results can be compared directly. Evaluation, predictions and explainable AI (feature importances) work on it with the same calls. Its settings go in <code>forest_options</code> (number of trees up to 2000, minimum rows per leaf, depth, features per split, class weight). Forest jobs run beside quantum jobs instead of waiting for them. In the web app, Training Settings has Quantum and Random Forest tabs; the tab shown is the model Run Training trains (see <a href="../user_guide/#random-forest">Random Forest</a>). Two new example notebooks: <code>06_random_forest.ipynb</code> (the Quick Start's steps with a forest) and <code>07_quantum_and_forest.ipynb</code> (both models side by side), and the script <code>quantum_and_forest.py</code>.</p>
+</li>
+</ul>
+<h2 id="version-09-release-notes">Version 0.9 Release Notes</h2>
+<p>Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.</p>
+<h3 id="release-094-11-november-2026">Release 0.94 - 11 November 2026</h3>
+<ul>
+<li><strong>Delete uploaded files and models from the SDK</strong> -- <code>client.datasets.uploads()</code> lists your uploaded files and <code>client.datasets.delete_upload(dataset_id)</code> deletes one. <code>client.inference.delete_model(train_id)</code> deletes one of your trained models. A model needs the file it was trained on, so delete the models trained on a file before the file (see <a href="../user_guide/#your-uploaded-files">Your Uploaded Files</a>).</li>
+<li><strong>Your own models only</strong> -- <code>client.inference.models()</code>, <code>redcedar models</code> and the web app's Recent Models list the models you trained. They listed every user's models before.</li>
+<li><strong>Sample datasets</strong> -- The web app has two kinds of uploaded files: training datasets, with the classes or target values the model learns from, and sample datasets, the rows a trained model classifies or predicts. Inference &gt; Classification and Regression run the active model on a sample dataset whose columns fit it, show the predictions, and download them as a CSV file. Scoring a model on its held-out test rows moved to Model Training &gt; Evaluate.</li>
+<li><strong>How a dataset will train</strong> -- After a training dataset is uploaded, the web app shows how it will be trained (for example "Trains as classification of the last column, diagnosis"), in the upload list, and on Run Training. A file whose target is whole numbers is detected as classification, one class per value; a link offers to train it as regression instead.</li>
+<li><strong>Delete models in the web app</strong> -- Recent Models has a delete button on each model, with a two-step confirmation.</li>
+<li><strong>Public datasets</strong> -- In the web app, a file you upload can be made public: other users then see it under Public Files, with your name, and can train on it. Only you (or a super user) can delete it.</li>
+<li><strong>Uploaded files are private</strong> -- A user can use an uploaded file only when it is theirs or public, in every request that takes its ID.</li>
+<li><strong>Models are private</strong> -- Evaluation, predictions, training analysis and explainable AI refuse a model that another user trained, as if it didn't exist.</li>
+<li><strong>The 20-file limit keeps files that models need</strong> -- When an upload takes a user past 20 files, the oldest is deleted as before, unless a trained model still needs it: a model reads its training file again, so deleting it would break the model.</li>
+<li><strong>Admin pages</strong> -- An Admin section in the web app's menu holds Jobs, Users, Uploads and Models. Admins can use Jobs (and now manage the job queue, which needed the super role) and Models, a list of every user's trained models; super users can also manage users, see and delete every user's uploaded files, and delete any model. Job Management shows each job's owner by name, and its tables sort by any column. The sort on the admin pages is remembered.</li>
+<li><strong>User Management</strong> -- A Last Active column (who is using the app right now), an invite dialog, and a way to sign out and manage your account on a phone.</li>
+<li><strong>Training Settings page</strong> -- Regrouped: the dataset first, the seed among the primary settings, and an Execution section with the backend and parallelization.</li>
+<li><strong>WDBC with its original labels</strong> -- The catalog's WDBC dataset now has the diagnosis as <code>M</code> and <code>B</code>, from the original UCI release, instead of OpenML's <code>1</code> and <code>2</code>. The rows are the same. <strong>Models trained on WDBC with an earlier version predict <code>1</code>/<code>2</code>: retrain them to get <code>M</code>/<code>B</code>.</strong></li>
+<li><strong>Bug fix: the queue status shared the running job's owner</strong> -- Every signed-in user's queue status included the running job's ID and its owner's user ID. Only the job's owner gets them now.</li>
+</ul>
+<h3 id="release-093-8-november-2026">Release 0.93 - 8 November 2026</h3>
+<ul>
+<li><strong>Predictions on new data</strong> -- <code>client.inference.run(train_id, "new_data.csv")</code> returns a prediction for each row: the class label and the probability of each class, or a number for a regression model. When the file also has the target column, the result includes the accuracy (classification) or the mean absolute error (regression). Columns are matched by header name, or by position in a file without a header row. <code>output="predictions.csv"</code> writes the rows with their predictions.</li>
+<li><strong>Evaluation renamed</strong> -- Scoring a model on the test rows held back from its training run is now <code>client.training.evaluate(train_id)</code>, and <code>client.inference.run()</code> makes predictions on new data. Code that called <code>inference.run(train_id)</code> for the test accuracy must change to <code>training.evaluate(train_id)</code>. The example notebooks are updated.</li>
+<li><strong>Regression</strong> -- <code>training.run(..., task="regression")</code> trains a regression model. Without <code>task=</code>, the task is detected from the target column; whole numbers are read as classes, so pass <code>task="regression"</code> for a target of whole numbers. Evaluation, predictions and the training replay support regression models (loss and mean absolute error); explainable AI supports classification models only. Settings: <code>num_qubits_target</code> (default 2) and <code>loss_type</code> (default <code>weighted_hamming</code>). <strong>Regression predictions are not useful yet in this release:</strong> on the Energy Efficiency example the model predicts about the same value for every sample, and its error is larger than that of predicting the average (see <a href="../known_issues/">Known Issues</a>).</li>
+<li><strong>Train on all rows</strong> -- <code>test_size=0</code> trains the model on every row. The model then has no test set: the layer results have no test values, and <code>training.evaluate()</code> and <code>training.analyze()</code> report that there are no test rows.</li>
+<li><strong>CSV files directly</strong> -- <code>training.run()</code> and <code>inference.run()</code> take a CSV file path and upload it.</li>
+<li><strong>Command line</strong> -- The <code>redcedar</code> command: <code>redcedar train</code>, <code>evaluate</code>, <code>predict</code> and <code>models</code> (also <code>python -m redcedar</code>).</li>
+<li><strong>Connecting</strong> -- <code>connect()</code> defaults to <code>http://127.0.0.1:8002</code>. A hosted server requires an API key (see <a href="../user_guide/#connecting-to-a-server">Connecting to a Server</a>). <code>connect(local=True)</code> calls the Red Cedar code directly in your Python process, with no server, for development with the Red Cedar source (<code>pip install -e .</code> in the <code>red-cedar</code> folder); see <a href="../user_guide/#local-mode-for-development">Local Mode</a>.</li>
+<li><strong>Quieter progress</strong> -- <code>verbose=True</code> now prints the progress line, a dot every few seconds while the job is working, and the test result after each training layer. The server's full log for the job, which <code>verbose=True</code> used to print, now needs <code>verbose="log"</code> (<code>--log</code> on the command line).</li>
+<li><strong>Explainable AI names principal components</strong> -- With dimension reduction (<code>dimension_reduction: "pca"</code>, the default), a data qubit holds a principal component, a mix of all the dataset's columns. Explainable AI now names it <code>PC1</code>, <code>PC2</code>, ... and lists in <code>made_of</code> the columns with the largest shares of it, largest first; the web UI shows them in a table under the qubit mapping. With <code>dimension_reduction: "none"</code>, each data qubit holds one column and is named after it (see <a href="../user_guide/#explainable-ai">Explainable AI</a>).</li>
+<li><strong>Examples</strong> -- The example notebooks are reworked and saved with the output of a run, so they can be read on GitHub. The Quick Start trains on classified samples, classifies the samples in a second file, and checks the predicted classes against their actual classes; <code>quick_start.py</code> does the same from the command line. <code>05_regression.ipynb</code> shows the same steps for regression. The other notebooks follow the same structure, and <code>01_full_pipeline.ipynb</code> is removed (see <a href="../examples/">Examples</a>).</li>
+<li><strong>Documentation</strong> -- The Quick Start's second step is "Classify Samples Using the Trained Model". The User Guide explains the training loss and accuracy, and what explainable AI's feature names mean with and without dimension reduction.</li>
+<li><strong>Versions</strong> -- <code>client.status()</code> and <code>redcedar status</code> show the server's version and the SDK's. The SDK now follows the server's version number: this release is SDK 0.93.0 (it was 0.1.0), and SDK-only fixes get a new patch number (0.93.1, 0.93.2, ...).</li>
+<li><strong>Bug fix: CUDA-Q server crash</strong> -- A server running on CUDA-Q could crash after several training jobs. Fixed.</li>
+<li><strong>Bug fix: seeded CUDA-Q runs</strong> -- Two CUDA-Q runs with the same seed could give different results. Seeded runs now repeat.</li>
+<li><strong>CUDA-Q explainable AI</strong> -- Explainable AI on CUDA-Q is seeded and uses 10000 shots, so repeated runs on the same model give the same result. The shot count is temporary and will become a setting.</li>
+<li><strong>Bug fix: fractional targets in CSV files with a header row</strong> -- The target column of such a file was read as text, so a fractional regression target was detected as class labels. Targets that are numbers are now read as numbers.</li>
+<li><strong>Bug fix: CSV files without a header row and with text class labels</strong> -- The class label in the last column (for example <code>M</code>) made the first row look like a header, so the first sample was used as column names and not loaded. The header check now looks at the feature columns, and counts a text value at the top of the target column only when it doesn't occur again in that column (a column name, not a class label).</li>
+<li><strong>Bug fix: split sizes for uploaded files</strong> -- <code>train_size</code> and <code>test_size</code> were ignored for uploaded CSV files, which always used the 80/20 split.</li>
+<li><strong>Bug fix: explainable AI feature names</strong> -- With dimension reduction (the default), the numbers of the selected components were looked up in the dataset's column names, so a data qubit was labelled with a column it did not stand for (for example <code>mean_radius</code> for principal component 1). Components are now named as above.</li>
+<li><strong>Bug fix: explainable AI importance for features with more than one qubit</strong> -- The importance values were shifted by one qubit for each extra qubit of a feature, and the last data qubit always showed 0%. Each qubit now gets its own value.</li>
+<li><strong>Bug fix: web UI Job Management times and job types</strong> -- Times are shown in your local time zone (they were UTC without saying so), and each job is labelled with its type (training, inference, explainable AI, training analysis, PCA, mutual information, resource estimation).</li>
+</ul>
+<h3 id="release-092-2-november-2026">Release 0.92 - 2 November 2026</h3>
+<ul>
+<li><strong>CUDA-Q results corrected</strong> -- On the CUDA-Q backend, the predicted class was read from the wrong qubit: a data qubit instead of the prediction qubit. Training on CUDA-Q was therefore scored against the wrong bit. Results are now read by qubit index, the same way as on Qiskit. On a 6-qubit WDBC test, CUDA-Q test accuracy went from 0.535 to 0.781 (Qiskit: 0.746). <strong>Models trained on CUDA-Q with an earlier version should be retrained.</strong> Models trained on Qiskit are not affected.</li>
+<li><strong>Same bit order on Qiskit and CUDA-Q</strong> -- CUDA-Q circuits are now built so that their results come back in the same bit order as Qiskit, and results are no longer reversed after execution. Qiskit and CUDA-Q now give the same results for the same circuit, within shot noise.</li>
+<li><strong>Seed and operator direction</strong> -- Two new training settings: <code>seed</code>, which sets the initial parameters, and <code>op_direction</code> (<code>backward</code>, the default, or <code>forward</code>). Both are saved with the model. With a seed set, repeated runs give the same result on Qiskit and on CUDA-Q. On CUDA-Q, the first seeded run after the server starts can differ slightly from later runs with the same seed.</li>
+<li><strong>Shared optimizer for classification and regression</strong> -- Classification and regression now use the same optimizer and loss function code. Classification results are unchanged. The regression loss options are <code>hamming</code>, <code>weighted_hamming</code> and <code>huber</code>.</li>
+<li><strong>Bug fix: regression workflow</strong> -- The command-line regression workflow (<code>workflow_regression/</code>) failed with a <code>TypeError</code> at the final test step, after training had finished, so no results were saved. It now reports the test loss and saves results.</li>
+<li><strong>Bug fix: queued jobs</strong> -- A queued job started only when another request reached the server, so with only Python client SDK jobs, a queued job could wait indefinitely. The next queued job now starts as soon as the running job finishes.</li>
+<li><strong>Bug fix: job progress streams</strong> -- Progress events that arrived while the server was sending earlier events were dropped. Training curves could miss points, and a lost completion event left the client waiting. All events are now delivered, for both training and analysis jobs.</li>
+<li><strong>Bug fix: CSV files without a header row</strong> -- Class labels from a CSV file with no header row were read as numbers, and saving the per-class results failed. Class labels are now strings for both kinds of file. Regression targets are unchanged.</li>
+<li>Circuits that contain a mid-circuit measurement now raise a clear error instead of returning shifted bits on hardware. Red Cedar circuits do not contain any today.</li>
+<li>New checks in <code>tests/</code> for CUDA-Q bit order and class reading (<code>test_cudaq_bit_order.py</code>, <code>check_cudaq_class_read.py</code>), CUDA-Q results against an exact statevector (<code>test_cudaq_cct_exact.py</code>), Qiskit and CUDA-Q equivalence (<code>test_api_equivalence.py</code>), and explainable AI from start to finish on both APIs (<code>check_eai.py</code>).</li>
+</ul>
+<h3 id="release-091-28-september-2026">Release 0.91 - 28 September 2026</h3>
+<ul>
+<li><strong>IQM hardware support</strong> -- Training and inference can run on IQM quantum computers (Garnet, Sirius, Emerald) through <code>qiskit-iqm</code>, using backend IDs such as <code>iqm-garnet</code>. Circuits are sent in batches of 100. The access token is read from <code>IQM_API_TOKEN</code>. <strong>Requires an additional package</strong>: <code>pip install qiskit-iqm</code>.</li>
+<li><strong>Stop a running job</strong> -- A new endpoint, <code>POST /jobs/{job_id}/stop</code>, stops any running or queued job: training, inference or explainable AI.</li>
+<li><strong>Data loading and preprocessing (preview)</strong> -- A new module, <code>quantum_learning/data_loading/</code>, adds <code>ClassicalData.load_data()</code>, train/test splitting, preprocessing (including PCA that chooses the number of components automatically), bit-bit encoding transforms, settings with type checking, and saving and loading of preprocessing objects. The notebook <code>advanced_data_loading.ipynb</code> in the same folder shows how to use it. The training workflows and the server do not use it yet.</li>
+<li>Fixed server startup on Windows: <code>run_server.bat</code> now starts the server with <code>python -m uvicorn</code>.</li>
+</ul>
+<h3 id="release-090-23-september-2026">Release 0.90 - 23 September 2026</h3>
+<p>Version 0.9 is the base version from which versioning began. It provides a server for dataset analysis, training, inference and explainable AI, along with command-line workflows for classification and regression and a Python client SDK for notebooks and scripts. Models are defined as hierarchical operators rather than circuits and are synthesized for the selected backend; training uses sub-net initialization, bit-bit encoding of classical data, and exact coordinate update, with no classical optimizer. Circuits run on Qiskit simulators, on CUDA-Q (including multi-GPU execution), and on IonQ simulators and hardware.</p>
+<p><br>
+&nbsp;&copy;&nbsp;2026 Cascade Quantum. All Rights Reserved.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

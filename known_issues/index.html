@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Cascade Quantum">
+        <link rel="canonical" href="https://coherent-computing.github.io/redcedar/known_issues/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>PAL - Red Cedar</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../css/custom.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Red Cedar</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../quick_start/" class="nav-link">Quick Start</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../user_guide/" class="nav-link">User Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../release_notes/" class="nav-link">Releases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="./" class="nav-link active" aria-current="page">PAL</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../about/" class="nav-link">About</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../release_notes/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../about/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#pal-problems-anomalies-and-limitations" class="nav-link">PAL — Problems, Anomalies, and Limitations</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#limitations" class="nav-link">Limitations</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#anomalies" class="nav-link">Anomalies</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#known-problems" class="nav-link">Known Problems</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="pal-problems-anomalies-and-limitations">PAL — Problems, Anomalies, and Limitations</h1>
+<p>As with most complex and evolving software, <strong>Red Cedar</strong> has several issues you may want to be aware of. This section describes known <strong>P</strong>roblems, <strong>A</strong>nomalies, and <strong>L</strong>imitations. Being aware of these in advance can help avoid frustration.</p>
+<h2 id="limitations">Limitations</h2>
+<p>These are fundamental limitations in the current implementation. Some may be relaxed in future versions.</p>
+<h4 id="tasks-and-data">Tasks and Data</h4>
+<ul>
+<li>
+<p><strong>Explainable AI supports classification models only.</strong> Regression models (<code>task="regression"</code>) train, evaluate and predict, but <code>explainable.run()</code> refuses them.</p>
+</li>
+<li>
+<p><strong>A model needs its training file on the server.</strong> New rows are prepared the way the training data was (scaling, compression, encoding), and that preparation is rebuilt from the training data each time. So evaluation, predictions, training analysis and explainable AI all read the model's training file again, and fail once it is gone. An uploaded training file goes away when you delete it (<code>datasets.delete_upload()</code> or the web app), when you upload another file with the same name and choose to replace it, or when a super user deletes it. Before a delete or a replace, the web app says how many trained models need the file, and <code>datasets.uploads()</code> gives the same count as <code>models</code>. The limit of 20 uploaded files per user doesn't delete a file that a model needs. Catalog datasets are not affected. <strong>Workaround</strong>: keep a training file as long as you use the models trained on it; delete those models first (<code>inference.delete_model()</code>) when you no longer need them.</p>
+</li>
+<li>
+<p><strong>Regression predictions stay within the range of the training targets.</strong> The model encodes the target on <code>num_qubits_target</code> qubits (default 2, so 4 levels) as a fraction of the range between the smallest and largest training target. A prediction is the average of that fraction over the measured outcomes, so it can't fall outside that range, and its resolution depends on the number of target qubits.</p>
+</li>
+<li>
+<p><strong>Only CSV files can be uploaded.</strong> You can train on the catalog datasets and on CSV files you upload, but you can't yet plug in your own data loaders.</p>
+</li>
+</ul>
+<h4 id="server">Server</h4>
+<ul>
+<li>
+<p><strong>The server runs one job at a time.</strong> Jobs submitted while another job is running are queued and start in order.</p>
+</li>
+<li>
+<p><strong>Only training can be stopped.</strong> Inference, explainable AI and the training replay run to completion once they start.</p>
+</li>
+<li>
+<p><strong>Each user keeps their 20 most recent models.</strong> When a training takes a signed-in user past 20 trained models, their oldest models are deleted. Models trained with no user (a local server, or the backend key) are not limited, and a restart doesn't delete models. <strong>Workaround</strong>: to keep an older model, copy its folder from <code>server/training_results/</code>.</p>
+</li>
+<li>
+<p><strong>A restart drops jobs that were running.</strong> When the server starts, it removes jobs that were running when it stopped. They are not restarted; submit them again. Queued jobs are kept.</p>
+</li>
+<li>
+<p><strong>Run one server per Red Cedar folder.</strong> All servers started from the same <code>red-cedar</code> folder share its job database (<code>server/jobs.db</code>). This includes a Qiskit server on the host and a CUDA-Q server in a container that mounts the same folder. Two servers running at once take each other's queued jobs and can fail with <code>disk I/O error</code>. Stop one server before starting another.</p>
+</li>
+</ul>
+<h4 id="cuda-q">CUDA-Q</h4>
+<ul>
+<li>
+<p><strong>CUDA-Q samples; the Qiskit simulator is exact.</strong> CUDA-Q always estimates probabilities from shots. When no shot count is set, training, validation and inference on CUDA-Q use 100 shots, while the Qiskit statevector simulator computes exact probabilities. Results on the two APIs therefore differ somewhat for the same settings and seed. Explainable AI on CUDA-Q uses 10000 shots; this is a temporary value and will become a setting.</p>
+</li>
+<li>
+<p><strong>Seeds don't make MPI multi-GPU runs repeatable yet.</strong> In the circuit-parallel (<code>RC_PARALLEL=1</code>) and hybrid (<code>RC_GPUS_PER_CIRCUIT</code>) modes, the execution library sets the CUDA-Q target again inside its multi-GPU code, which drops the seed. Results are valid, but two runs with the same seed can differ. Single-GPU runs, and runs that spread one circuit across several GPUs, are seeded normally.</p>
+</li>
+</ul>
+<h4 id="qiskit">Qiskit</h4>
+<ul>
+<li><strong>On Qiskit, a seed fixes only the starting parameters when shots are used.</strong> With a shot count set, or on a hardware or fake hardware backend, the sampling itself is not seeded, so results vary from run to run. Default runs on the statevector simulator are exact and repeat.</li>
+</ul>
+<h2 id="anomalies">Anomalies</h2>
+<p>These are not bugs per se, but behaviors worth knowing about.</p>
+<h4 id="seeds">Seeds</h4>
+<ul>
+<li>
+<p><strong>The same seed gives different results on Qiskit and CUDA-Q.</strong> Both start from the same parameters, but CUDA-Q estimates probabilities from shots and the Qiskit simulator computes them exactly (see Limitations), so training takes a different path.</p>
+</li>
+<li>
+<p><strong>An unseeded run right after a seeded run can repeat.</strong> On a running server, the random state carries over from one job to the next. Two unseeded runs that each follow the same seeded run start from the same state and give the same result. To get different random starts, give each run its own seed.</p>
+</li>
+</ul>
+<h4 id="data">Data</h4>
+<ul>
+<li>
+<p><strong>With <code>test_size=0</code> the training log still prints test results.</strong> The training workflows test the model before and after training; with no test set, they test on a few training rows. Those results appear in the log but are not reported: the layer results have no test values.</p>
+</li>
+<li>
+<p><strong>Regression targets that are whole numbers are treated as classes unless you say otherwise.</strong> The task type is detected from the target column, and a column holding only whole numbers (including values like <code>12.0</code>) looks like class labels. <strong>Workaround</strong>: pass <code>task="regression"</code> to <code>training.run()</code> (or <code>--task regression</code> on the command line).</p>
+</li>
+</ul>
+<h2 id="known-problems">Known Problems</h2>
+<p>These are specific bugs or issues that may be fixed in future releases.</p>
+<h4 id="regression">Regression</h4>
+<ul>
+<li><strong>Regression predictions are not useful yet.</strong> On the Energy Efficiency example (<code>05_regression.ipynb</code> in the examples), the model predicts about the same value for every sample, near the top of the target range, and its mean absolute error is larger than that of always predicting the average training value. The training loss falls while the test loss does not improve. Classification is not affected.</li>
+</ul>
+<h4 id="output">Output</h4>
+<ul>
+<li><strong>Training logs a <code>DEBUG:</code> line on every parameter update.</strong> The line comes from <code>quantum_learning/optimizer.py</code> and makes the server's training log much longer. The SDK shows it only with <code>verbose="log"</code>. It does not affect results.</li>
+</ul>
+<h4 id="tests">Tests</h4>
+<ul>
+<li><strong><code>tests/test_circuit_builders.py</code> fails to import.</strong> It imports <code>cudaq_builders.ansatz</code>, which no longer exists (the module is now <code>quantum_ansatz.py</code>).</li>
+</ul>
+<p><br>
+&nbsp;&copy;&nbsp;2026 Cascade Quantum. All Rights Reserved.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
