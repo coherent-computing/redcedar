@@ -125,13 +125,24 @@ Ctrl+C stops a local training run, as `training.stop()` does; the layers that fi
 Red Cedar trains on tables: one row per example, input features first, and the **last column is the target**,
 the answer the model learns. A CSV file is the usual way to provide one.
 
-- **Header row:** optional. A first row counts as a header when any of its cells is text. With a header, Red
-  Cedar knows your columns by name, which `inference.run()` uses to match new files and explainable AI uses to
-  name features. Without one, columns are known by position only.
+- **Header row:** optional. A first row counts as a header when it has text above a column of numbers. With a
+  header, Red Cedar knows your columns by name, which `inference.run()` uses to match new files and explainable
+  AI uses to name features. Without one, columns are known by position only.
 - **One caveat:** a file without a header whose last column holds text labels (such as `M`/`B`) has text in its
   first row and would be read as having a header. Give such files a header row.
 - **Features** are numbers. Red Cedar scales, normalizes and compresses them as part of training (see
   [Data preparation](#data-preparation) under Settings).
+- **Columns that are not features** are left out by themselves, so you don't need to remove them first:
+    - text columns, such as a patient name (a column of numbers with a few text values is still an error, to
+      catch a data problem);
+    - IDs: a column of whole numbers named like an ID (`id`, `patient_id`, `sample`, `mrn`, anything ending in
+      `_id`, ...);
+    - row numbers or sequential IDs at the start of the row, in a file without a header: whole numbers, all
+      different, forming one unbroken run (such as 1 to 500), in a file of 20 rows or more.
+
+  Training reports the columns it left out (in the log, and when you upload a file in the web app), and they
+  are never used for predictions either: new files may have them or not. A numbered ID with gaps in a file
+  without a header can't be told from a measurement; give the file a header row naming it `id`.
 
 Pass the path of a CSV file wherever a dataset is expected:
 
