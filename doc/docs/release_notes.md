@@ -3,11 +3,11 @@
 **Red Cedar** is continually evolving, with issues fixed and enhancements made to add features.
 This section presents a brief record of relevant changes made to each version that has been released. Latest version is at the top.
 
-## Version 0.9 Release Notes
+## Version 2.0 Release Notes
 
-Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.
+### Release 2.0 - 14 November 2026
 
-### Release 0.95 - not released yet
+- **Bug fix: queued jobs in the web app showed no results** -- When Explainable AI, Evaluate, Classification, Regression or Training Analysis had to wait in the queue and then ran quickly, the page went back to "Idle" without showing the results. The page now shows them.
 
 - **Bug fix: N bits per feature** -- `bits_type` `"1"`, `"2"` or `"3"` (the web app's "N bits per feature") stopped training with "num_bits should be sum of pca_bits" unless the number of features times N happened to equal the data qubits. It now takes as many of the most important features as the data qubits hold; the last one gets the qubits left over.
 - **Bug fix: local mode with a new job database** -- The first upload in [local mode](user_guide.md#local-mode-for-development) failed with "no such table: jobs" when the job database was new.
@@ -19,6 +19,10 @@ Version 0.9 is the first tagged version of Red Cedar. Each release below lists t
 - **Columns that are not features are left out** -- Text columns (such as a patient name) and ID columns (named like an ID, or row numbers at the start of a file without a header) are no longer used as features, and training reports them. A text column used to stop training with an error, and a numbered ID was used as a feature, which can make the test accuracy look better than it is. Prediction files may have these columns or not (see [Your Own Data](user_guide.md#your-own-data)).
 
 - **Random forest baseline** -- `settings={"model": "random_forest"}` trains a random forest, a classical model, instead of the quantum model, on the same training rows, and tests it on the same held-out rows, so the two results can be compared directly. Evaluation, predictions and explainable AI (feature importances) work on it with the same calls. Its settings go in `forest_options` (number of trees up to 2000, minimum rows per leaf, depth, features per split, class weight). Forest jobs run beside quantum jobs instead of waiting for them. In the web app, Training Settings has Quantum and Random Forest tabs; the tab shown is the model Run Training trains (see [Random Forest](user_guide.md#random-forest)). Two new example notebooks: `06_random_forest.ipynb` (the Quick Start's steps with a forest) and `07_quantum_and_forest.ipynb` (both models side by side), and the script `quantum_and_forest.py`.
+
+## Version 0.9 Release Notes
+
+Version 0.9 is the first tagged version of Red Cedar. Each release below lists the changes since the one before it.
 
 ### Release 0.94 - 11 November 2026
 
