@@ -123,10 +123,15 @@ def save_training(folder, data, settings, result):
 
 def print_explanation(result, top):
     """The features a model relies on, most important first."""
-    if "feature_importances" in result:   # a random forest: one importance per column
+    if result.get("model") == "random_forest":   # one importance per column
         rows = [(f["feature_name"], f["importance"]) for f in result["feature_importances"][:top]]
         print("Random forest feature importances (share of the trees' error reduction):")
-    else:                                 # the quantum model: one importance per data qubit
+    elif result.get("feature_importances"):      # the quantum model: one importance per feature
+        rows = [(f["feature_name"] + (" (" + ", ".join(f"q{q['qubit']} {q['importance']:.0%}" for q in f["qubits"]) + ")"
+                                      if len(f["qubits"]) > 1 else f" (q{f['qubits'][0]['qubit']})"),
+                 f["importance"]) for f in result["feature_importances"][:top]]
+        print("Importance of each feature (probability that any of its qubits reads 1):")
+    else:                                        # an older server: one importance per data qubit
         qubits = sorted(result.get("qubit_map") or [], key=lambda q: -(q.get("importance") or 0))
         rows = [(f"q{q['qubit']}: {q['feature_name']}", q.get("importance") or 0) for q in qubits[:top]]
         print("Importance of each data qubit (the feature it holds):")

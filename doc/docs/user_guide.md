@@ -484,8 +484,21 @@ for qid, val in explanation["convergence"].items():
 
 Returns a dict with `train_id`, `layer`, `dataset_name`, `num_qubits`, `num_class_qubits`, `class_range`,
 `qubit_map` (a list of dicts with `qubit`, `feature_index`, `feature_name`, `bits`, `bit`, `made_of`,
-`importance`),
+`importance`), `feature_importances` (below),
 `convergence` (class qubit ID to convergence value), `distributions`, `feature_indices`, and timings.
+
+A feature can be encoded on more than one data qubit (with `bits_type` `"2"` or `"3"`, or the default
+`"importance"`, which gives the more informative features more qubits). `qubit_map` then has one importance
+per qubit, and `feature_importances` has one per feature, largest first: the probability that any of the
+feature's qubits reads 1. For a feature on one qubit that is the qubit's importance. Each entry has
+`feature_name`, `feature_index`, `importance`, `qubits` (each qubit with its own importance) and `made_of`.
+The same list, without `qubits`, is what a [random forest](#random-forest) returns.
+
+```python
+for f in explanation["feature_importances"]:
+    qubits = ", ".join(f"q{q['qubit']} {q['importance']:.0%}" for q in f["qubits"])
+    print(f"{f['feature_name']}: {f['importance']:.1%} ({qubits})")
+```
 
 ## Random Forest
 
